@@ -3,6 +3,8 @@ local form = require("microblog.form")
 local categories = require("microblog.categories")
 local config = require("microblog.config")
 
+local M = {}
+
 --- Get contents of a buffer or lines appearing in a visual selection
 ---
 --- @return string
@@ -93,7 +95,7 @@ local function send_post_request(data, data_formatter)
   end
 end
 
-local function push_post()
+function M.push_post()
   vim.b.micro = vim.b.micro or {}
 
   -- start getting categories from the server first to reduce waiting later
@@ -128,4 +130,4 @@ local function push_post()
   end
 end
 
-return push_post()
+return M
