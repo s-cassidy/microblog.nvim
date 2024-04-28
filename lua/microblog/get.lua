@@ -6,6 +6,8 @@ local action_state = require "telescope.actions.state"
 local telescope_conf = require("telescope.config").values
 local job = require('plenary.job')
 
+local M = {}
+
 local function get_posts()
   local destination
   if #config.blogs > 1 then
@@ -97,7 +99,7 @@ local function telescope_choose_post(posts, cb)
 end
 
 
-local function pick_post()
+function M.pick_post()
   local posts = get_posts()
   if vim.wait(10000, function() return #posts > 0 end, 400) then
     telescope_choose_post(posts, open_post)

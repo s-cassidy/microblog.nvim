@@ -7,7 +7,7 @@ local function get_api_key()
 end
 
 local function setup(opts)
-  vim.tbl_extend("force", { config, opts })
+  vim.tbl_extend("force", config, opts)
   config.api_key = get_api_key()
 end
 

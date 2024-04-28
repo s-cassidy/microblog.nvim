@@ -1,6 +1,8 @@
 local config = require("microblog.config")
 local job = require("plenary.job")
 
+local M = {}
+
 local function fetch_categories(blog_url)
   local category_job = job:new({
     command = "curl",
@@ -22,7 +24,7 @@ local function extract_categories_from_json_feed(json_feed)
 end
 
 
-local function get_categories(url)
+function M.get_categories(url)
   local categories_json = fetch_categories(url)
   local await_categories_feed = vim.wait(5000, function() return #categories_json > 0 end)
   if await_categories_feed then
@@ -33,6 +35,4 @@ local function get_categories(url)
   end
 end
 
-return {
-  get_categories
-}
+return M

@@ -1,11 +1,12 @@
-local categories = require("microblog.categories")
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local telescope_conf = require("telescope.config").values
 
-local function telescope_choose_categories(all_categories, chosen_categories, cb)
+local M = {}
+
+function M.telescope_choose_categories(all_categories, chosen_categories, cb)
   vim.b.micro.categories = vim.b.micro.categories or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
@@ -59,7 +60,6 @@ local function telescope_choose_categories(all_categories, chosen_categories, cb
   })
   cat_picker:find()
 end
-
 
 local function choose_title()
   local title
@@ -116,7 +116,7 @@ local function choose_draft()
 end
 
 
-local function collect_user_options()
+function M.collect_user_options()
   local opts_table = {}
   opts_table.title = choose_title()
   opts_table.destination = choose_destination()
@@ -125,7 +125,4 @@ local function collect_user_options()
   return opts_table
 end
 
-return {
-  collect_user_options,
-  telescope_choose_categories
-}
+return M
