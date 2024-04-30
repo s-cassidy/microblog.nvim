@@ -38,7 +38,7 @@ Desintation blog: %s
 Categories: %s
 Draft: %s]]):format(
     status_for_display.title or "",
-    status_for_display.url or "New post",
+    (status_for_display.url == "" and "New post") or status_for_display.url,
     status_for_display.destination or "",
     categories_string or "",
     (status_for_display.draft and "Yes") or "No"
