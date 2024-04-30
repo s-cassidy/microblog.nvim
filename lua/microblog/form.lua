@@ -68,7 +68,7 @@ local function choose_title()
   vim.ui.input(
     {
       prompt = "Post title (optional): ",
-      default = status.get_status("url") or ""
+      default = status.get_status("title") or ""
     },
     function(input)
       title = input
@@ -107,7 +107,7 @@ local function choose_url()
   local url = ""
   vim.ui.input(
     {
-      prompt = "Post url: (leave blank for new post)",
+      prompt = "Post url (leave blank for new post): ",
       default = status.get_status("url") or ""
     },
     function(input)

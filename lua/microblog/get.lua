@@ -9,25 +9,7 @@ local job = require('plenary.job')
 
 local M = {}
 
-local function get_posts()
-  local destination
-  local blogs_map = {}
-  local blog_urls = {}
-  for _, blog in ipairs(config.blogs) do
-    blogs_map[blog.url] = blog.uid
-    table.insert(blog_urls, blog.url)
-  end
-  if #config.blogs > 1 then
-    vim.ui.select(blog_urls,
-      {
-        prompt = "Edit post from: ",
-      },
-      function(input)
-        destination = blogs_map[input]
-      end)
-  else
-    destination = config.blogs[1]
-  end
+local function get_posts(destination)
   local curl_job = job:new(
     {
       command = "curl",
@@ -61,22 +43,12 @@ local function format_telescope_entry_string(post)
 end
 
 
-local function open_post(post)
-  local props = post.properties
-  local post_text = props.content[1]
+local function open_post(post_text)
   local text_lines = vim.split(post_text, "\n")
   local buffer = vim.api.nvim_create_buf(true, false)
   vim.api.nvim_set_current_buf(buffer)
   vim.api.nvim_buf_set_lines(buffer, 0, 0, false, text_lines)
   vim.bo.filetype = "markdown"
-  status.set_post_status({
-    url = props.url[1],
-    destination = props.uid[1],
-    categories = props.category,
-    title = props.name[1],
-    draft = (props["post-status"][1] == "draft")
-  }
-  )
 end
 
 local function telescope_choose_post(posts, cb)
@@ -95,7 +67,7 @@ local function telescope_choose_post(posts, cb)
       end
     }),
     sorter = telescope_conf.generic_sorter(),
-    attach_mappings = function(prompt_bufnr, map)
+    attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         local selection = action_state.get_selected_entry().value
         actions.close(prompt_bufnr)
@@ -109,9 +81,39 @@ end
 
 
 function M.pick_post()
-  local posts = get_posts()
+  local destination
+  local blogs_map = {}
+  local blog_urls = {}
+  for _, blog in ipairs(config.blogs) do
+    blogs_map[blog.url] = blog.uid
+    table.insert(blog_urls, blog.url)
+  end
+  if #config.blogs > 1 then
+    vim.ui.select(blog_urls,
+      {
+        prompt = "Edit post from: ",
+      },
+      function(input)
+        destination = blogs_map[input]
+      end)
+  else
+    destination = config.blogs[1]
+  end
+  local posts = get_posts(destination)
   if vim.wait(10000, function() return #posts > 0 end, 400) then
-    telescope_choose_post(posts, open_post)
+    telescope_choose_post(posts, function(selection)
+      local props = selection.properties
+      open_post(props.content[1])
+      status.set_post_status({
+        url = props.url[1],
+        destination = destination,
+        categories = props.category,
+        title = props.name[1],
+        draft = (props["post-status"][1] == "draft")
+      }
+      )
+    end
+    )
   end
 end
 
