@@ -63,6 +63,8 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
   cat_picker:find()
 end
 
+--- Pick the post title
+---@return string
 local function choose_title()
   local title
   vim.ui.input(
@@ -77,17 +79,21 @@ local function choose_title()
 end
 
 
+--- Pick the post destination. If the post has been loaded from a blog already, use that
+---@return
 local function choose_destination()
-  local destination
-  local urls_list = {}
-  local urls_map = {}
   if status.get_status("destination") then
     return status.get_status("destination")
   end
+
+  local destination
+  local urls_list = {}
+  local urls_map = {}
   for _, blog in ipairs(config.blogs) do
     table.insert(urls_list, blog.url)
     urls_map[blog.url] = blog.uid
   end
+
   if #config.blogs > 1 then
     vim.ui.select(urls_list,
       {
@@ -99,12 +105,16 @@ local function choose_destination()
   else
     destination = config.blogs[1].uid
   end
+
   return destination
 end
 
 
+--- Pick an url to post to
+---@return string
 local function choose_url()
   local url = ""
+  -- would this be better as vim.ui.select?
   vim.ui.input(
     {
       prompt = "Post url (leave blank for new post): ",
@@ -117,6 +127,8 @@ local function choose_url()
 end
 
 
+--- Should post be made as a draft?
+---@return boolean
 local function choose_draft()
   local draft
   vim.ui.select({ "Yes", "No" }, {
