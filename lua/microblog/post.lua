@@ -113,12 +113,18 @@ function M.push_post()
 
   local chosen_categories = {}
   local all_destination_categories = categories.get_categories(data.opts.destination)
-  form.telescope_choose_categories(all_destination_categories, chosen_categories,
-    function()
-      data.opts.categories = chosen_categories
-      send_post_request(data, formatter)
-    end
-  )
+  if all_destination_categories == {} then
+    print("No categories found for " .. data.opts.destination)
+    data.opts.categories = {}
+    send_post_request(data, formatter)
+  else
+    form.telescope_choose_categories(all_destination_categories, chosen_categories,
+      function()
+        data.opts.categories = chosen_categories
+        send_post_request(data, formatter)
+      end
+    )
+  end
 end
 
 return M
