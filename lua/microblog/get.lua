@@ -81,6 +81,10 @@ end
 
 
 function M.pick_post()
+  if config.api_key == nil then
+    print("No API key found")
+    return
+  end
   local destination
   local blogs_map = {}
   local blog_urls = {}

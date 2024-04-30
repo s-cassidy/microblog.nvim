@@ -128,6 +128,10 @@ function M.push_post()
   local data = {}
   data.text = get_text()
   data.key = config.api_key
+  if data.key == nil then
+    print("No API key found")
+    return
+  end
   data.opts = form.collect_user_options()
 
   local chosen_categories = {}
