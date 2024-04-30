@@ -28,8 +28,8 @@ end
 function M.get_post_status_string(data)
   local status = load_status()
   local status_for_display = data or status
-  if (not status_for_display or status_for_display == {}) then
-    vim.notify("Does not seem to be a micro.blog post")
+  if vim.tbl_isempty(status_for_display) then
+    return nil
   end
   local categories_string = table.concat(status_for_display.categories, ", ")
   return ([[Post title: %s
@@ -43,6 +43,15 @@ Draft: %s]]):format(
     categories_string or "",
     (status_for_display.draft and "Yes") or "No"
   )
+end
+
+function M.display_post_status()
+  local status_for_display = M.get_post_status_string()
+  if status_for_display == nil then
+    vim.notify("Does not seem to be a micro.blog post")
+    return
+  end
+  vim.notify("micro.blog post information\n" .. status_for_display)
 end
 
 return M
