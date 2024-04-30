@@ -1,3 +1,4 @@
+local status = require("microblog.status")
 local config = require("microblog.config")
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
@@ -68,12 +69,14 @@ local function open_post(post)
   vim.api.nvim_set_current_buf(buffer)
   vim.api.nvim_buf_set_lines(buffer, 0, 0, false, text_lines)
   vim.bo.filetype = "markdown"
-  vim.b.micro = {
+  status.set_post_status({
     url = props.url[1],
-    uid = props.uid[1],
+    destination = props.uid[1],
     categories = props.category,
-    title = props.name[1]
+    title = props.name[1],
+    draft = (props["post-status"][1] == "draft")
   }
+  )
 end
 
 local function telescope_choose_post(posts, cb)

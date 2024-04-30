@@ -1,4 +1,5 @@
 local job = require('plenary.job')
+local status = require('microblog.status')
 local form = require("microblog.form")
 local categories = require("microblog.categories")
 local config = require("microblog.config")
@@ -33,7 +34,6 @@ local function micropub_new_post_formatter(data)
       category = data.opts.categories
     }
   }
-  vim.api.nvim_buf_set_lines(0, -1, -1, false, { vim.fn.json_encode(json_data) })
   return vim.fn.json_encode(json_data)
 end
 
@@ -86,8 +86,9 @@ local function send_post_request(data, data_formatter)
       print("Posting failed: " .. result.error_description)
       return false
     else
-      vim.b.micro = result
-      print("New post made to " .. result.url)
+      data.opts.url = result.url
+      status.set_post_status(data.opts)
+      print("Post made to " .. result.url)
       return true
     end
   else
@@ -95,33 +96,49 @@ local function send_post_request(data, data_formatter)
   end
 end
 
-function M.push_post()
-  vim.b.micro = vim.b.micro or {}
-
-  categories.refresh_categories()
-
+local function finalise_post(data, categories_table)
   local formatter
-  local data = {}
-  data.text = get_text()
-  data.key = config.api_key
-  data.opts = form.collect_user_options()
   if data.opts.url == "" then
     formatter = micropub_new_post_formatter
   else
     formatter = micropub_update_post_formatter
   end
+  data.opts.categories = categories_table
+
+  local confirm = nil
+  vim.ui.select({ "Post", "Abort" },
+    {
+      prompt = "You are about to make a post with the following settings\n" ..
+          status.get_post_status_string(data.opts) .. "\n"
+    },
+    function(choice)
+      confirm = (choice == "Post")
+    end)
+
+  if confirm then
+    send_post_request(data, formatter)
+    status.set_post_status(data.opts)
+  end
+end
+
+
+function M.push_post()
+  categories.refresh_categories()
+
+  local data = {}
+  data.text = get_text()
+  data.key = config.api_key
+  data.opts = form.collect_user_options()
 
   local chosen_categories = {}
   local all_destination_categories = categories.get_categories(data.opts.destination)
   if all_destination_categories == {} then
     print("No categories found for " .. data.opts.destination)
-    data.opts.categories = {}
-    send_post_request(data, formatter)
+    finalise_post(data, {})
   else
     form.telescope_choose_categories(all_destination_categories, chosen_categories,
       function()
-        data.opts.categories = chosen_categories
-        send_post_request(data, formatter)
+        finalise_post(data, chosen_categories)
       end
     )
   end

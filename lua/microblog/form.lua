@@ -1,5 +1,6 @@
-local pickers = require "telescope.pickers"
 local config = require "microblog.config"
+local status = require "microblog.status"
+local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
@@ -8,7 +9,7 @@ local telescope_conf = require("telescope.config").values
 local M = {}
 
 function M.telescope_choose_categories(all_categories, chosen_categories, cb)
-  local existing_categories = vim.b.micro.categories or {}
+  local existing_categories = status.get_status("categories") or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
     prompt_title =
@@ -67,11 +68,10 @@ local function choose_title()
   vim.ui.input(
     {
       prompt = "Post title (optional): ",
-      default = vim.b.micro.title or ""
+      default = status.get_status("url") or ""
     },
     function(input)
       title = input
-      vim.b.micro.title = title
     end)
   return title
 end
@@ -81,6 +81,9 @@ local function choose_destination()
   local destination
   local urls_list = {}
   local urls_map = {}
+  if status.get_status("destination") then
+    return status.get_status("destination")
+  end
   for _, blog in ipairs(config.blogs) do
     table.insert(urls_list, blog.url)
     urls_map[blog.url] = blog.uid
@@ -105,7 +108,7 @@ local function choose_url()
   vim.ui.input(
     {
       prompt = "Post url: (leave blank for new post)",
-      default = vim.b.micro.url or ""
+      default = status.get_status("url") or ""
     },
     function(input)
       url = input
