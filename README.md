@@ -26,6 +26,7 @@ Install in the usual way using your plugin manager, for example
     dependencies = {
         'nvim-telescope/telescope.nvim',
         'nvim-lua/plenary.nvim'
+    }
 }
 ```
 
