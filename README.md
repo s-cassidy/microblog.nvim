@@ -62,7 +62,7 @@ Note that `microblog.nvim` does not set any keymaps by default.
 
 ## Usage
 
-`microblog.nvim` exposes 4 functions to the user that are also available as commands.
+`microblog.nvim` exposes 5 functions to the user that are also available as commands.
 
 ### `pick_post()` or `MicroBlogPickPost`
 
@@ -77,6 +77,10 @@ This command is used to send your post back to the server and publish it on your
 If you are editing an existing post you selected with `pick_post` or you have already successfully used `push_post` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
 
 You can also use `push_post` in visual mode and only selected lines of text will be posted.
+
+### `quick_post()` or `MicroBlogQuickPost`
+
+For quickly dashing off a "micro" post. This will post the current buffer with no title or categories to the **first** blog in your `blogs` list.
 
 ### `display_post_status()` or `MicroBlogDisplayStatus`
 
