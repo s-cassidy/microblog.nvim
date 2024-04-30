@@ -61,16 +61,16 @@ Requests a list of posts from the server, and allows you to choose a post to edi
 
 Once selected, the post will be opened in a new buffer ready for editing.
 
-## `push_post` or `MicroBlogPushPost`
+### `push_post` or `MicroBlogPushPost`
 
 This command is used to send your post back to the server and publish it on your blog. You will be asked to set some options such as a title (optional, naturally). Then you will be asked to set some categories for the post if they're enabled on your blog, again using `telescope`. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
 
 If you are editing an existing post you selected with `pick_post` or you have already successfully used `push_post` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
 
-## `display_post_status` or `MicroBlogDisplayStatus`
+### `display_post_status` or `MicroBlogDisplayStatus`
 
 If your buffer has been posted to the server already using `push_post`, or else loaded from the server using `pick_post`, you can use `display_post_status` to check some details about the post such as its title, url, and categories it belongs to.
 
-## `reset_post_status` or `MicroBlogResetStatus`
+### `reset_post_status` or `MicroBlogResetStatus`
 
 This will clear all the post metadata associated with the current buffer. Using `push_post` after using `reset_post_status` will be as if you're making a brand new post, even if you originally opened the buffer using `pick_post`.
