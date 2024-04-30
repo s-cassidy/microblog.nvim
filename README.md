@@ -6,6 +6,14 @@ Simple plugin for posting to a [micro.blog](https://micro.blog)-hosted blog.
 
 `microblog.nvim` has depends on two neovim plugins and an external dependency, all of which you probably already have. These are the plugins `telescope.nvim` and `plenary.nvim`, and the CLI tool `curl`.
 
+On Mac you can do
+
+```
+brew install curl
+```
+
+On Linux use your usual package manager.
+
 ## Installation
 
 Install in the usual way using your plugin manager, for example
@@ -67,6 +75,8 @@ This command is used to send your post back to the server and publish it on your
 
 If you are editing an existing post you selected with `pick_post` or you have already successfully used `push_post` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
 
+You can also use `push_post` in visual mode and only selected lines of text will be posted.
+
 ### `display_post_status()` or `MicroBlogDisplayStatus`
 
 If your buffer has been posted to the server already using `push_post`, or else loaded from the server using `pick_post`, you can use `display_post_status` to check some details about the post such as its title, url, and categories it belongs to.
@@ -79,4 +89,10 @@ This will clear all the post metadata associated with the current buffer. Using 
 
 The next feature I would like to implement is a proper `telescope` previewer for `pick_post`. Another nice feature would be automatically inserting the html for uploaded images. I'm open to PRs on both of these things.
 
+I do not currently have plans to support other fuzzy finders such as `mini.fuzzy` or `fzf-lua`. PRs welcome if you want to implement these.
+
 I don't intend to add any features relating to following other users, reading other posts, or uploading photos. This is plugin is purely for writing and editing text posts, because neovim is a _text editor_.
+
+## Thanks
+
+To [Manton](https://manton.org) for creating micro.blog, as well as [HeyLoura](https://heyloura.com/) (check out her awesome site!) who built [LilliHub](https://lillihub.com/), whose source code provided useful examples of the API.
