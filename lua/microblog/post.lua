@@ -83,16 +83,17 @@ local function send_post_request(data, data_formatter)
   if await_post_confirmation then
     local result = vim.fn.json_decode(result_raw)
     if result.error then
-      print("Posting failed: " .. result.error_description)
+      print("\nPosting failed: " .. result.error_description)
       return false
     else
       data.opts.url = result.url
       status.set_post_status(data.opts)
-      print("Post made to " .. result.url)
+      print("\nPost made to " .. result.url)
       return true
     end
   else
-    return false
+    status.set_post_status(data.opts)
+    return true
   end
 end
 
@@ -136,8 +137,8 @@ function M.push_post()
 
   local chosen_categories = {}
   local all_destination_categories = categories.get_categories(data.opts.destination)
-  if all_destination_categories == {} then
-    print("No categories found for " .. data.opts.destination)
+  if vim.tbl_isempty(all_destination_categories) then
+    print("\nNo categories found for " .. data.opts.destination)
     finalise_post(data, {})
   else
     form.telescope_choose_categories(all_destination_categories, chosen_categories,
