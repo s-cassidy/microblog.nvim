@@ -8,6 +8,9 @@ M = {}
 M.pick_post = get.pick_post
 M.push_post = post.push_post
 
+local M = {}
+M.pick_post = get.pick_post
+M.push_post = post.push_post
 local function get_api_key()
   return os.getenv(config.api_key_variable)
 end
