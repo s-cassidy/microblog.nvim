@@ -15,15 +15,15 @@ local function get_posts(destination)
       command = "curl",
       args = {
         "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
-        "-H", "Authorization: Bearer " .. config.api_key
-      "--connect-timeout", "10",
+        "-H", "Authorization: Bearer " .. config.api_key,
+        "--connect-timeout", "10",
       },
       enabled_recording = true,
     }
   )
   curl_job:sync()
   local result_raw = curl_job:result()
-  if string.match(result_raw, "400 Bad request") then
+  if string.match(result_raw[1], "400 Bad request") then
     vim.notify("Bad request. Did you set your blog's UID correctly?")
     return
   end
@@ -80,7 +80,18 @@ local function telescope_choose_post(posts, cb)
         actions.close(prompt_bufnr)
         cb(selection)
       end)
-      return true
+      map("i", "<CR>", actions.select_default)
+      map("n", "<CR>", actions.select_default)
+      map("n", "<esc>", actions.close)
+      map("n", "q", actions.close)
+      map("n", "<C-c>", actions.close)
+      map("i", "<up>", actions.move_selection_previous)
+      map("i", "<down>", actions.move_selection_next)
+      map("i", "<C-p>", actions.move_selection_previous)
+      map("i", "<C-n>", actions.move_selection_next)
+      map("n", "<up>", actions.move_selection_previous)
+      map("n", "<down>", actions.move_selection_next)
+      return false
     end
   })
   post_picker:find()
