@@ -98,16 +98,12 @@ end
 function M.push_post()
   vim.b.micro = vim.b.micro or {}
 
-  -- start getting categories from the server first to reduce waiting later
-  local categories_table = {}
-  for _, blog in ipairs(config.blogs) do
-    categories_table[blog.uid] = categories.get_categories(blog.url)
-  end
+  categories.refresh_categories()
 
   local formatter
   local data = {}
   data.text = get_text()
-  data.key = config.key
+  data.key = config.api_key
   data.opts = form.collect_user_options()
   if data.opts.url == "" then
     formatter = micropub_new_post_formatter
@@ -116,18 +112,13 @@ function M.push_post()
   end
 
   local chosen_categories = {}
-  vim.notify("Awaiting categories list")
-  if vim.wait(5000, function()
-        return (#categories_table[data.opts.destination] > 0 or categories_table == nil)
-      end, 400) then
-    local all_destination_categories = categories_table[data.opts.destination]
-    form.telescope_choose_categories(all_destination_categories, chosen_categories,
-      function()
-        data.opts.categories = chosen_categories
-        send_post_request(data, formatter)
-      end
-    )
-  end
+  local all_destination_categories = categories.get_categories(data.opts.destination)
+  form.telescope_choose_categories(all_destination_categories, chosen_categories,
+    function()
+      data.opts.categories = chosen_categories
+      send_post_request(data, formatter)
+    end
+  )
 end
 
 return M

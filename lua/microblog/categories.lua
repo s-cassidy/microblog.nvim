@@ -1,22 +1,16 @@
-local config = require("microblog.config")
 local job = require("plenary.job")
+local config = require("microblog.config")
 
 local M = {}
-
-local function fetch_categories(blog_url)
-  local category_job = job:new({
-    command = "curl",
-    args = { blog_url .. "/categories/feed.json" },
-    enable_recording = true,
-  })
-  category_job:start()
-  return category_job:result()
-end
+local raw_list = {}
 
 
 local function extract_categories_from_json_feed(json_feed)
   local categories_table = {}
-  local feeds_table = vim.fn.json_decode(json_feed)
+  local success, feeds_table = pcall(vim.fn.json_decode, json_feed)
+  if not success then
+    return {}
+  end
   for _, item in pairs(feeds_table.items) do
     table.insert(categories_table, item.title)
   end
@@ -24,15 +18,27 @@ local function extract_categories_from_json_feed(json_feed)
 end
 
 
-function M.get_categories(url)
-  local categories_json = fetch_categories(url)
-  local await_categories_feed = vim.wait(5000, function() return #categories_json > 0 end)
-  if await_categories_feed then
-    config.categories = extract_categories_from_json_feed(categories_json)
-  else
-    config.categories = nil
-    print("No categories found at " .. url .. "/categories/feed.json")
+local function fetch_categories(blog)
+  local category_job = job:new({
+    command = "curl",
+    args = { blog.url .. "/categories/feed.json" },
+    enable_recording = true,
+    on_exit = function(j)
+      raw_list[blog.uid] = j:result()
+    end
+  })
+  category_job:start()
+end
+
+
+function M.refresh_categories()
+  for _, blog in ipairs(config.blogs) do
+    fetch_categories(blog)
   end
+end
+
+function M.get_categories(uid)
+  return extract_categories_from_json_feed(raw_list[uid])
 end
 
 return M

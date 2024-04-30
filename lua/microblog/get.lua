@@ -10,13 +10,19 @@ local M = {}
 
 local function get_posts()
   local destination
+  local blogs_map = {}
+  local blog_urls = {}
+  for _, blog in ipairs(config.blogs) do
+    blogs_map[blog.url] = blog.uid
+    table.insert(blog_urls, blog.url)
+  end
   if #config.blogs > 1 then
-    vim.ui.select(config.blogs,
+    vim.ui.select(blog_urls,
       {
         prompt = "Edit post from: ",
       },
       function(input)
-        destination = input
+        destination = blogs_map[input]
       end)
   else
     destination = config.blogs[1]
@@ -26,12 +32,12 @@ local function get_posts()
       command = "curl",
       args = {
         "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
-        "-H", "Authorization: Bearer " .. config.key
+        "-H", "Authorization: Bearer " .. config.api_key
       },
       enabled_recording = true,
     }
   )
-  print("Acquiring posts — this may take a moment")
+  vim.wait(10, function() return false end, 5)
   curl_job:sync()
   local result_raw = curl_job:result()
   local result = vim.fn.json_decode(result_raw)["items"]
@@ -106,6 +112,4 @@ function M.pick_post()
   end
 end
 
-return {
-  pick_post
-}
+return M

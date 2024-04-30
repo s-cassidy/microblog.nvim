@@ -1,4 +1,5 @@
 local pickers = require "telescope.pickers"
+local config = require "microblog.config"
 local finders = require "telescope.finders"
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
@@ -7,7 +8,7 @@ local telescope_conf = require("telescope.config").values
 local M = {}
 
 function M.telescope_choose_categories(all_categories, chosen_categories, cb)
-  vim.b.micro.categories = vim.b.micro.categories or {}
+  local existing_categories = vim.b.micro.categories or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
     prompt_title =
@@ -47,13 +48,13 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
           return
         end
 
-        local i = 1
         for entry in picker.manager:iter() do
-          if vim.tbl_contains(vim.b.micro.categories, entry) then
-            picker:add_selection(picker:get_row(i))
+          if vim.tbl_contains(existing_categories, entry[1]) then
+            local row = picker:get_row(entry.index)
+            picker:add_selection(row)
           end
-          i = i + 1
         end
+        startup_complete = true
       end
     }
 
@@ -64,9 +65,13 @@ end
 local function choose_title()
   local title
   vim.ui.input(
-    { prompt = "Post title (optional): " },
+    {
+      prompt = "Post title (optional): ",
+      default = vim.b.micro.title or ""
+    },
     function(input)
       title = input
+      vim.b.micro.title = title
     end)
   return title
 end
@@ -74,16 +79,22 @@ end
 
 local function choose_destination()
   local destination
+  local urls_list = {}
+  local urls_map = {}
+  for _, blog in ipairs(config.blogs) do
+    table.insert(urls_list, blog.url)
+    urls_map[blog.url] = blog.uid
+  end
   if #config.blogs > 1 then
-    vim.ui.select(config.blogs,
+    vim.ui.select(urls_list,
       {
         prompt = "Destination: ",
       },
       function(input)
-        destination = input
+        destination = urls_map[input]
       end)
   else
-    destination = config.blogs[1]
+    destination = config.blogs[1].uid
   end
   return destination
 end
@@ -118,8 +129,8 @@ end
 
 function M.collect_user_options()
   local opts_table = {}
-  opts_table.title = choose_title()
   opts_table.destination = choose_destination()
+  opts_table.title = choose_title()
   opts_table.url = choose_url()
   opts_table.draft = choose_draft()
   return opts_table
