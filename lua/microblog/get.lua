@@ -22,6 +22,7 @@ local function get_posts(destination)
     }
   )
   curl_job:sync()
+
   local result_raw = curl_job:result()
   if string.match(result_raw[1], "400 Bad request") then
     vim.notify("Bad request. Did you set your blog's UID correctly?")
@@ -132,8 +133,7 @@ function M.pick_post()
         categories = props.category,
         title = props.name[1],
         draft = (props["post-status"][1] == "draft")
-      }
-      )
+      })
     end
     )
   end
