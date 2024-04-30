@@ -45,6 +45,10 @@ Draft: %s]]):format(
   )
 end
 
+function M.reset_post_status()
+  vim.b.micro = {}
+end
+
 function M.display_post_status()
   local status_for_display = M.get_post_status_string()
   if status_for_display == nil then
