@@ -16,14 +16,21 @@ local function get_posts(destination)
       args = {
         "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
         "-H", "Authorization: Bearer " .. config.api_key
+      "--connect-timeout", "10",
       },
       enabled_recording = true,
     }
   )
-  vim.wait(10, function() return false end, 5)
   curl_job:sync()
   local result_raw = curl_job:result()
+  if string.match(result_raw, "400 Bad request") then
+    vim.notify("Bad request. Did you set your blog's UID correctly?")
+    return
+  end
   local result = vim.fn.json_decode(result_raw)["items"]
+  if vim.tbl_isempty(result) then
+    vim.notify("Server sent an empty response. Did you set your API key correctly?")
+  end
   return result
 end
 
@@ -67,7 +74,7 @@ local function telescope_choose_post(posts, cb)
       end
     }),
     sorter = telescope_conf.generic_sorter(),
-    attach_mappings = function(prompt_bufnr)
+    attach_mappings = function(prompt_bufnr, map)
       actions.select_default:replace(function()
         local selection = action_state.get_selected_entry().value
         actions.close(prompt_bufnr)
