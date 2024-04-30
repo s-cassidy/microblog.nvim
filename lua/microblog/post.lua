@@ -97,14 +97,13 @@ local function send_post_request(data, data_formatter)
   end
 end
 
-local function finalise_post(data, categories_table)
+local function finalise_post(data)
   local formatter
   if data.opts.url == "" then
     formatter = micropub_new_post_formatter
   else
     formatter = micropub_update_post_formatter
   end
-  data.opts.categories = categories_table
 
   local confirm = nil
   vim.ui.select({ "Post", "Abort" },
@@ -139,14 +138,34 @@ function M.push_post()
   local all_destination_categories = categories.get_categories(data.opts.destination)
   if vim.tbl_isempty(all_destination_categories) then
     print("\nNo categories found for " .. data.opts.destination)
-    finalise_post(data, {})
+    data.opts.categories = chosen_categories
+    finalise_post(data)
   else
     form.telescope_choose_categories(all_destination_categories, chosen_categories,
       function()
-        finalise_post(data, chosen_categories)
+        data.opts.categories = chosen_categories
+        finalise_post(data)
       end
     )
   end
+end
+
+function M.quick_post()
+  local data = {}
+  data.text = get_text()
+  data.key = config.api_key
+  if data.key == nil then
+    print("No API key found")
+    return
+  end
+  data.opts = {
+    title = "",
+    draft = false,
+    categories = {},
+    destination = config.blogs[1].uid,
+    url = ""
+  }
+  finalise_post(data)
 end
 
 return M
