@@ -22,7 +22,7 @@ Install in the usual way using your plugin manager, for example
 
 ```lua
 {
-'s-cassidy/microblog.nvim'
+    's-cassidy/microblog.nvim',
     dependencies = {
         'nvim-telescope/telescope.nvim',
         'nvim-lua/plenary.nvim'
