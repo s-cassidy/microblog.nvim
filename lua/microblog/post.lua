@@ -58,10 +58,10 @@ end
 
 
 --- Run curl to post to the blog
---- @param data {text: string, key: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
+--- @param data {text: string, token: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
 --- @return boolean
 local function send_post_request(data, data_formatter)
-  local auth_string = "Authorization: Bearer " .. data.key
+  local auth_string = "Authorization: Bearer " .. data.token
   local formatted_data = data_formatter(data)
   local args = {
     "https://micro.blog/micropub",
@@ -127,9 +127,9 @@ function M.push_post()
 
   local data = {}
   data.text = get_text()
-  data.key = config.api_key
-  if data.key == nil then
-    print("No API key found")
+  data.token = config.app_token
+  if data.token == nil then
+    print("No app token found")
     return
   end
   data.opts = form.collect_user_options()
@@ -153,9 +153,9 @@ end
 function M.quick_post()
   local data = {}
   data.text = get_text()
-  data.key = config.api_key
-  if data.key == nil then
-    print("No API key found")
+  data.token = config.app_token
+  if data.token == nil then
+    print("No app token found")
     return
   end
   data.opts = {

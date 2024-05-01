@@ -1,5 +1,6 @@
 return {
-  api_key_variable = "MB_API_KEY",
+  app_token_variable = "MB_APP_TOKEN",
   blogs = {
-  }
+  },
+  always_input_url = false
 }

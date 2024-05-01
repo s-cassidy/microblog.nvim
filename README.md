@@ -32,9 +32,9 @@ Install in the usual way using your plugin manager, for example
 
 ## Configuration
 
-You will need an API key from micro.blog. Go to [account settings](https://micro.blog/account) and scroll to App Tokens near the bottom.
+You will need an app token from micro.blog. Go to [account settings](https://micro.blog/account) and scroll to App Tokens near the bottom.
 
-microblog.nvim loads this key from a shell environment variable. By default this is `MB_API_KEY`, but you can change it.
+microblog.nvim loads this key from a shell environment variable. By default this is `MB_APP_TOKEN`, but you can change it.
 
 You must pass an array `blogs`, where each entry is a table with fields `url` and `uid`. Your `uid` is _probably_ your blog's `https://something.micro.blog` address. Your `url` may be the same, or it may be your custom domain name.
 
@@ -42,7 +42,7 @@ You must pass an array `blogs`, where each entry is a table with fields `url` an
 
 ```lua
 {
-    api_key_variable = "MB_API_KEY",
+    app_token_variable = "MB_APP_TOKEN",
     blogs = {
         {
             url = "https://mysuperblog1.com",

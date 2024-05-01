@@ -16,14 +16,14 @@ vim.api.nvim_create_user_command("MicroBlogPushPost", post.push_post, {})
 vim.api.nvim_create_user_command("MicroBlogDisplayStatus", status.display_post_status, {})
 vim.api.nvim_create_user_command("MicroBlogResetStatus", status.reset_post_status, {})
 
-local function get_api_key()
-  return os.getenv(config.api_key_variable)
+local function get_app_token()
+  return os.getenv(config.app_token_variable)
 end
 
 function M.setup(opts)
-  config.api_key_variable = config.api_key_variable or opts.api_key_variable
+  config.app_token_variable = config.app_token_variable or opts.app_token_variable
   config.blogs = opts.blogs
-  config.api_key = get_api_key()
+  config.app_token = get_app_token()
 end
 
 return M

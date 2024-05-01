@@ -15,7 +15,7 @@ local function get_posts(destination)
       command = "curl",
       args = {
         "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
-        "-H", "Authorization: Bearer " .. config.api_key,
+        "-H", "Authorization: Bearer " .. config.app_token,
         "--connect-timeout", "10",
       },
       enabled_recording = true,
@@ -30,7 +30,7 @@ local function get_posts(destination)
   end
   local result = vim.fn.json_decode(result_raw)["items"]
   if vim.tbl_isempty(result) then
-    vim.notify("Server sent an empty response. Did you set your API key correctly?")
+    vim.notify("Server sent an empty response. Did you set your app token correctly?")
   end
   return result
 end
@@ -100,8 +100,8 @@ end
 
 
 function M.pick_post()
-  if config.api_key == nil then
-    print("No API key found")
+  if config.app_token == nil then
+    print("No app token found")
     return
   end
   local destination
