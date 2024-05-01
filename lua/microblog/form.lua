@@ -113,18 +113,29 @@ end
 --- Pick an url to post to
 ---@return string
 local function choose_url()
-  local url = status.get_status("url") or ""
-  if url == "" then
-    return url
+  if config.always_input_url then
+    vim.ui.input(
+      {
+        prompt = "Post url (leave blank for new post): ",
+        default = status.get_status("url") or ""
+      },
+      function(input)
+        url = input
+      end)
+  else
+    local url = status.get_status("url") or ""
+    if url == "" then
+      return url
+    end
+    local options = { "Update " .. url, "New post" }
+    vim.ui.select(options,
+      {},
+      function(input)
+        if input == options[2] then
+          url = ""
+        end
+      end)
   end
-  local options = { "Update " .. url, "New post" }
-  vim.ui.select(options,
-    {},
-    function(input)
-      if input == options[2] then
-        url = ""
-      end
-    end)
   return url
 end
 

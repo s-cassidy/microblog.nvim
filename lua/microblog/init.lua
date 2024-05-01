@@ -23,6 +23,7 @@ end
 function M.setup(opts)
   config.app_token_variable = config.app_token_variable or opts.app_token_variable
   config.blogs = opts.blogs
+  config.always_input_url = opts.always_input_url
   config.app_token = get_app_token()
 end
 
