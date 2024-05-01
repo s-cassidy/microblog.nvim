@@ -115,9 +115,14 @@ local function finalise_post(data)
       confirm = (choice == "Post")
     end)
 
-  if confirm then
-    send_post_request(data, formatter)
+  if not confirm then
+    return false
+  end
+
+  local result = send_post_request(data, formatter)
+  if result then
     status.set_post_status(data.opts)
+    return result
   end
 end
 
@@ -165,7 +170,10 @@ function M.quick_post()
     destination = config.blogs[1].uid,
     url = ""
   }
-  finalise_post(data)
+  local result = finalise_post(data)
+  if result and config.no_save_quickpost then
+    vim.bo.buftype = "nowrite"
+  end
 end
 
 return M

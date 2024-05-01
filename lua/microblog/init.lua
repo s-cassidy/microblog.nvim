@@ -24,6 +24,7 @@ function M.setup(opts)
   config.app_token_variable = opts.app_token_variable or config.app_token_variable
   config.blogs = opts.blogs
   config.always_input_url = opts.always_input_url or config.always_input_url
+  config.no_save_quickpost = opts.no_save_quickpost or config.no_save_quickpost
   config.app_token = get_app_token()
 end
 

@@ -38,7 +38,10 @@ microblog.nvim loads this key from a shell environment variable. By default this
 
 You must pass an array `blogs`, where each entry is a table with fields `url` and `uid`. Your `uid` is _probably_ your blog's `https://something.micro.blog` address. Your `url` may be the same, or it may be your custom domain name.
 
-There is an option `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as false, it will just use the existing url attached to the post, which should work better for most people.
+Other options:
+
+- `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as `false`, it will just use the existing url attached to the post, which should work better for most people.
+- `no_save_quickpost`. If set to `true`, then using the `quick_post()` function will also set the buffer to a `nowrite` buffer (see below).
 
 **Example**
 
@@ -56,6 +59,7 @@ There is an option `always_input_url`. If this is set to `true`, you will be giv
         }
     },
     always_input_url = false,
+    no_save_quickpost = false,
 }
 ```
 
@@ -84,6 +88,8 @@ You can also use `push_post` in visual mode and only selected lines of text will
 ### `quick_post()` or `MicroBlogQuickPost`
 
 For quickly dashing off a "micro" post. This will post the current buffer with no title or categories to the **first** blog in your `blogs` list.
+
+If `no_save_quickpost` is set to `true`, this means you can `:q` without saving after running `quick_post()`. In other words, set this option if you don't care about keeping a local copy of your "micro" posts once they have been posted. You can still manually save with `:w <filename>`, if you like.
 
 ### `display_post_status()` or `MicroBlogDisplayStatus`
 
