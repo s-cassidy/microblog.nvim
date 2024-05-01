@@ -38,6 +38,8 @@ microblog.nvim loads this key from a shell environment variable. By default this
 
 You must pass an array `blogs`, where each entry is a table with fields `url` and `uid`. Your `uid` is _probably_ your blog's `https://something.micro.blog` address. Your `url` may be the same, or it may be your custom domain name.
 
+There is an option `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as false, it will just use the existing url attached to the post, which should work better for most people.
+
 **Example**
 
 ```lua
@@ -52,7 +54,8 @@ You must pass an array `blogs`, where each entry is a table with fields `url` an
             url = "https://mysuperblog2.micro.blog",
             uid = "https://mysuperblog2.micro.blog"
         }
-    }
+    },
+    always_input_url = false,
 }
 ```
 
