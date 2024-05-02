@@ -16,7 +16,7 @@ end
 
 function M.get_status(field)
   local status = initialise_status()
-  if (status[field] and #status[field] > 0) then
+  if status[field] and #status[field] > 0 then
     return status[field]
   else
     return nil

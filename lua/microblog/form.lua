@@ -1,9 +1,9 @@
-local config = require "microblog.config"
-local status = require "microblog.status"
-local pickers = require "telescope.pickers"
-local finders = require "telescope.finders"
-local actions = require "telescope.actions"
-local action_state = require "telescope.actions.state"
+local config = require("microblog.config")
+local status = require("microblog.status")
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
 local telescope_conf = require("telescope.config").values
 
 local M = {}
@@ -12,11 +12,8 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
   local existing_categories = status.get_status("categories") or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
-    prompt_title =
-    "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
-    finder = finders.new_table(
-      { results = all_categories }
-    ),
+    prompt_title = "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
+    finder = finders.new_table({ results = all_categories }),
     sorter = telescope_conf.generic_sorter(),
     attach_mappings = function(prompt_bufnr, map)
       actions.select_default:replace(function()
@@ -56,9 +53,8 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
           end
         end
         startup_complete = true
-      end
-    }
-
+      end,
+    },
   })
   cat_picker:find()
 end
@@ -67,17 +63,14 @@ end
 ---@return string
 local function choose_title()
   local title
-  vim.ui.input(
-    {
-      prompt = "Post title (optional): ",
-      default = status.get_status("title") or ""
-    },
-    function(input)
-      title = input
-    end)
+  vim.ui.input({
+    prompt = "Post title (optional): ",
+    default = status.get_status("title") or "",
+  }, function(input)
+    title = input
+  end)
   return title
 end
-
 
 --- Pick the post destination. If the post has been loaded from a blog already, use that
 ---@return
@@ -95,13 +88,11 @@ local function choose_destination()
   end
 
   if #config.blogs > 1 then
-    vim.ui.select(urls_list,
-      {
-        prompt = "Destination: ",
-      },
-      function(input)
-        destination = urls_map[input]
-      end)
+    vim.ui.select(urls_list, {
+      prompt = "Destination: ",
+    }, function(input)
+      destination = urls_map[input]
+    end)
   else
     destination = config.blogs[1].uid
   end
@@ -109,51 +100,42 @@ local function choose_destination()
   return destination
 end
 
-
 --- Pick an url to post to
 ---@return string
 local function choose_url()
   if config.always_input_url then
-    vim.ui.input(
-      {
-        prompt = "Post url (leave blank for new post): ",
-        default = status.get_status("url") or ""
-      },
-      function(input)
-        url = input
-      end)
+    vim.ui.input({
+      prompt = "Post url (leave blank for new post): ",
+      default = status.get_status("url") or "",
+    }, function(input)
+      url = input
+    end)
   else
     local url = status.get_status("url") or ""
     if url == "" then
       return url
     end
     local options = { "Update " .. url, "New post" }
-    vim.ui.select(options,
-      {},
-      function(input)
-        if input == options[2] then
-          url = ""
-        end
-      end)
+    vim.ui.select(options, {}, function(input)
+      if input == options[2] then
+        url = ""
+      end
+    end)
   end
   return url
 end
-
 
 --- Should post be made as a draft?
 ---@return boolean
 local function choose_draft()
   local draft
   vim.ui.select({ "Yes", "No" }, {
-      prompt = "\nPost as a draft?"
-    },
-    function(choice)
-      draft = (choice == "Yes")
-    end
-  )
+    prompt = "\nPost as a draft?",
+  }, function(choice)
+    draft = (choice == "Yes")
+  end)
   return draft
 end
-
 
 function M.collect_user_options()
   local opts_table = {}

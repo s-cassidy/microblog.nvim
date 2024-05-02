@@ -1,5 +1,5 @@
-local job = require('plenary.job')
-local status = require('microblog.status')
+local job = require("plenary.job")
+local status = require("microblog.status")
 local form = require("microblog.form")
 local categories = require("microblog.categories")
 local config = require("microblog.config")
@@ -22,7 +22,6 @@ local function get_text()
   return text
 end
 
-
 local function micropub_new_post_formatter(data)
   local json_data = {
     type = { "h-entry" },
@@ -31,12 +30,11 @@ local function micropub_new_post_formatter(data)
       content = { { html = data.text } },
       name = { (data.opts.title or "") },
       ["post-status"] = { (data.opts.draft and "draft" or "published") },
-      category = data.opts.categories
-    }
+      category = data.opts.categories,
+    },
   }
   return vim.fn.json_encode(json_data)
 end
-
 
 --- Takes post data and formats for the new post API endpoint
 ---@param data table
@@ -50,12 +48,11 @@ local function micropub_update_post_formatter(data)
       name = { data.opts.title or "" },
       ["post-status"] = { (data.opts.draft and "draft") or "published" },
       content = { data.text },
-      category = data.opts.categories
-    }
+      category = data.opts.categories,
+    },
   }
   return vim.fn.json_encode(json_data)
 end
-
 
 --- Run curl to post to the blog
 --- @param data {text: string, token: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
@@ -65,21 +62,27 @@ local function send_post_request(data, data_formatter)
   local formatted_data = data_formatter(data)
   local args = {
     "https://micro.blog/micropub",
-    "-X", "POST",
-    "-H", auth_string,
-    "-H", "Content-Type: application/json",
-    "--data", formatted_data
+    "-X",
+    "POST",
+    "-H",
+    auth_string,
+    "-H",
+    "Content-Type: application/json",
+    "--data",
+    formatted_data,
   }
 
   local curl_job = job:new({
     command = "curl",
     args = args,
-    enable_recording = true
+    enable_recording = true,
   })
 
   curl_job:sync()
   local result_raw = curl_job:result()
-  local await_post_confirmation = vim.wait(5000, function() return #result_raw > 0 end)
+  local await_post_confirmation = vim.wait(5000, function()
+    return #result_raw > 0
+  end)
   if await_post_confirmation then
     local result = vim.fn.json_decode(result_raw)
     if result.error then
@@ -106,14 +109,13 @@ local function finalise_post(data)
   end
 
   local confirm = nil
-  vim.ui.select({ "Post", "Abort" },
-    {
-      prompt = "You are about to make a post with the following settings\n" ..
-          status.get_post_status_string(data.opts) .. "\n"
-    },
-    function(choice)
-      confirm = (choice == "Post")
-    end)
+  vim.ui.select({ "Post", "Abort" }, {
+    prompt = "You are about to make a post with the following settings\n"
+      .. status.get_post_status_string(data.opts)
+      .. "\n",
+  }, function(choice)
+    confirm = (choice == "Post")
+  end)
 
   if not confirm then
     return false
@@ -125,7 +127,6 @@ local function finalise_post(data)
     return result
   end
 end
-
 
 function M.push_post()
   categories.refresh_categories()
@@ -146,12 +147,10 @@ function M.push_post()
     data.opts.categories = chosen_categories
     finalise_post(data)
   else
-    form.telescope_choose_categories(all_destination_categories, chosen_categories,
-      function()
-        data.opts.categories = chosen_categories
-        finalise_post(data)
-      end
-    )
+    form.telescope_choose_categories(all_destination_categories, chosen_categories, function()
+      data.opts.categories = chosen_categories
+      finalise_post(data)
+    end)
   end
 end
 
@@ -168,7 +167,7 @@ function M.quick_post()
     draft = false,
     categories = {},
     destination = config.blogs[1].uid,
-    url = ""
+    url = "",
   }
   local result = finalise_post(data)
   if result and config.no_save_quickpost then

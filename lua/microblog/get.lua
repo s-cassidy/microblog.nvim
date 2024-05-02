@@ -1,26 +1,26 @@
 local status = require("microblog.status")
 local config = require("microblog.config")
-local pickers = require "telescope.pickers"
-local finders = require "telescope.finders"
-local actions = require "telescope.actions"
-local action_state = require "telescope.actions.state"
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
 local telescope_conf = require("telescope.config").values
-local job = require('plenary.job')
+local job = require("plenary.job")
 
 local M = {}
 
 local function get_posts(destination)
-  local curl_job = job:new(
-    {
-      command = "curl",
-      args = {
-        "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
-        "-H", "Authorization: Bearer " .. config.app_token,
-        "--connect-timeout", "10",
-      },
-      enabled_recording = true,
-    }
-  )
+  local curl_job = job:new({
+    command = "curl",
+    args = {
+      "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
+      "-H",
+      "Authorization: Bearer " .. config.app_token,
+      "--connect-timeout",
+      "10",
+    },
+    enabled_recording = true,
+  })
   curl_job:sync()
 
   local result_raw = curl_job:result()
@@ -34,7 +34,6 @@ local function get_posts(destination)
   end
   return result
 end
-
 
 local function format_telescope_entry_string(post)
   local published = post.properties.published[1]
@@ -50,7 +49,6 @@ local function format_telescope_entry_string(post)
   return post_date .. "  " .. snippet
 end
 
-
 local function open_post(post_text)
   local text_lines = vim.split(post_text, "\n")
   local buffer = vim.api.nvim_create_buf(true, false)
@@ -61,8 +59,7 @@ end
 
 local function telescope_choose_post(posts, cb)
   local post_picker = pickers.new({}, {
-    prompt_title =
-    "Select a post",
+    prompt_title = "Select a post",
     finder = finders.new_table({
       results = posts,
       entry_maker = function(entry)
@@ -72,7 +69,7 @@ local function telescope_choose_post(posts, cb)
           display = display,
           ordinal = entry.properties.published[1] .. entry.properties.name[1] .. entry.properties.content[1],
         }
-      end
+      end,
     }),
     sorter = telescope_conf.generic_sorter(),
     attach_mappings = function(prompt_bufnr, map)
@@ -93,11 +90,10 @@ local function telescope_choose_post(posts, cb)
       map("n", "<up>", actions.move_selection_previous)
       map("n", "<down>", actions.move_selection_next)
       return false
-    end
+    end,
   })
   post_picker:find()
 end
-
 
 function M.pick_post()
   if config.app_token == nil then
@@ -112,18 +108,18 @@ function M.pick_post()
     table.insert(blog_urls, blog.url)
   end
   if #config.blogs > 1 then
-    vim.ui.select(blog_urls,
-      {
-        prompt = "Edit post from: ",
-      },
-      function(input)
-        destination = blogs_map[input]
-      end)
+    vim.ui.select(blog_urls, {
+      prompt = "Edit post from: ",
+    }, function(input)
+      destination = blogs_map[input]
+    end)
   else
     destination = config.blogs[1]
   end
   local posts = get_posts(destination)
-  if vim.wait(10000, function() return #posts > 0 end, 400) then
+  if vim.wait(10000, function()
+    return #posts > 0
+  end, 400) then
     telescope_choose_post(posts, function(selection)
       local props = selection.properties
       open_post(props.content[1])
@@ -132,10 +128,9 @@ function M.pick_post()
         destination = destination,
         categories = props.category,
         title = props.name[1],
-        draft = (props["post-status"][1] == "draft")
+        draft = (props["post-status"][1] == "draft"),
       })
-    end
-    )
+    end)
   end
 end
 

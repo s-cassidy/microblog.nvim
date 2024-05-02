@@ -4,7 +4,6 @@ local config = require("microblog.config")
 local M = {}
 local raw_list = {}
 
-
 --- Take the /categories/feed.json server response and extract categories
 ---@param json_feed string
 ---@return string[]
@@ -20,7 +19,6 @@ local function extract_categories_from_json_feed(json_feed)
   return categories_table
 end
 
-
 --- Run curl to get the categories from a blog
 ---@param blog {url: string, uid: string}
 local function fetch_categories(blog)
@@ -30,11 +28,10 @@ local function fetch_categories(blog)
     enable_recording = true,
     on_exit = function(j)
       raw_list[blog.uid] = j:result()
-    end
+    end,
   })
   category_job:start()
 end
-
 
 function M.refresh_categories()
   for _, blog in ipairs(config.blogs) do
