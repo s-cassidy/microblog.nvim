@@ -26,6 +26,13 @@ function M.setup(opts)
   config.always_input_url = opts.always_input_url or config.always_input_url
   config.no_save_quickpost = opts.no_save_quickpost or config.no_save_quickpost
   config.app_token = get_app_token()
+  config.token_warn_on_startup = opts.token_warn_on_startup or config.token_warn_on_startup
+
+  if config.token_warn_on_startup then
+    if not config.app_token then
+      vim.schedule(function() print("Warning: no MicroBlog app token found") end)
+    end
+  end
 end
 
 return M

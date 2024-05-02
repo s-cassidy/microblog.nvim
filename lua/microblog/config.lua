@@ -3,4 +3,5 @@ return {
   blogs = {},
   always_input_url = false,
   no_save_quickpost = false,
+  token_warn_on_startup = false,
 }
