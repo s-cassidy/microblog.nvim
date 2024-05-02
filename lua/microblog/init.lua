@@ -30,7 +30,9 @@ function M.setup(opts)
 
   if config.token_warn_on_startup then
     if not config.app_token then
-      vim.schedule(function() print("Warning: no MicroBlog app token found") end)
+      vim.schedule(function()
+        print("Warning: no MicroBlog app token found")
+      end)
     end
   end
 end
