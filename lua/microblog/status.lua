@@ -14,6 +14,8 @@ function M.set_post_status(data)
   vim.b.micro = status
 end
 
+---
+---@param field string
 function M.get_status(field)
   local status = initialise_status()
   if status[field] and #status[field] > 0 then

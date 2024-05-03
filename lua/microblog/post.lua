@@ -111,8 +111,8 @@ local function finalise_post(data)
   local confirm = nil
   vim.ui.select({ "Post", "Abort" }, {
     prompt = "You are about to make a post with the following settings\n"
-      .. status.get_post_status_string(data.opts)
-      .. "\n",
+        .. status.get_post_status_string(data.opts)
+        .. "\n",
   }, function(choice)
     confirm = (choice == "Post")
   end)
@@ -120,6 +120,7 @@ local function finalise_post(data)
   if not confirm then
     return false
   end
+
 
   local result = send_post_request(data, formatter)
   if result then

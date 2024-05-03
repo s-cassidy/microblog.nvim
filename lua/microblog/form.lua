@@ -1,4 +1,5 @@
 local config = require("microblog.config")
+local util = require("microblog.util")
 local status = require("microblog.status")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -12,7 +13,8 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
   local existing_categories = status.get_status("categories") or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
-    prompt_title = "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
+    prompt_title =
+    "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
     finder = finders.new_table({ results = all_categories }),
     sorter = telescope_conf.generic_sorter(),
     attach_mappings = function(prompt_bufnr, map)
@@ -72,37 +74,11 @@ local function choose_title()
   return title
 end
 
---- Pick the post destination. If the post has been loaded from a blog already, use that
----@return
-local function choose_destination()
-  if status.get_status("destination") then
-    return status.get_status("destination")
-  end
-
-  local destination
-  local urls_list = {}
-  local urls_map = {}
-  for _, blog in ipairs(config.blogs) do
-    table.insert(urls_list, blog.url)
-    urls_map[blog.url] = blog.uid
-  end
-
-  if #config.blogs > 1 then
-    vim.ui.select(urls_list, {
-      prompt = "Destination: ",
-    }, function(input)
-      destination = urls_map[input]
-    end)
-  else
-    destination = config.blogs[1].uid
-  end
-
-  return destination
-end
 
 --- Pick an url to post to
 ---@return string
 local function choose_url()
+  local url
   if config.always_input_url then
     vim.ui.input({
       prompt = "Post url (leave blank for new post): ",
@@ -111,7 +87,7 @@ local function choose_url()
       url = input
     end)
   else
-    local url = status.get_status("url") or ""
+    url = status.get_status("url") or ""
     if url == "" then
       return url
     end
@@ -139,7 +115,7 @@ end
 
 function M.collect_user_options()
   local opts_table = {}
-  opts_table.destination = choose_destination()
+  opts_table.destination = util.choose_destination("post")
   opts_table.title = choose_title()
   opts_table.url = choose_url()
   opts_table.draft = choose_draft()

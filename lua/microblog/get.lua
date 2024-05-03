@@ -1,5 +1,6 @@
 local status = require("microblog.status")
 local config = require("microblog.config")
+local util = require("microblog.util")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local actions = require("telescope.actions")
@@ -9,11 +10,11 @@ local job = require("plenary.job")
 
 local M = {}
 
-local function get_posts(destination)
+local function make_source_request(destination, url)
   local curl_job = job:new({
     command = "curl",
     args = {
-      "https://micro.blog/micropub?q=source&mp-destination=" .. destination,
+      ("https://micro.blog/micropub?q=source&mp-destination=%s&url=%s"):format(destination, url),
       "-H",
       "Authorization: Bearer " .. config.app_token,
       "--connect-timeout",
@@ -28,11 +29,15 @@ local function get_posts(destination)
     vim.notify("Bad request. Did you set your blog's UID correctly?")
     return
   end
-  local result = vim.fn.json_decode(result_raw)["items"]
+  local result = vim.fn.json_decode(result_raw)
   if vim.tbl_isempty(result) then
     vim.notify("Server sent an empty response. Did you set your app token correctly?")
   end
   return result
+end
+
+local function get_post_list(destination)
+  return make_source_request(destination, "")["items"]
 end
 
 local function format_telescope_entry_string(post)
@@ -49,12 +54,20 @@ local function format_telescope_entry_string(post)
   return post_date .. "  " .. snippet
 end
 
-local function open_post(post_text)
+local function open_post(post_json, destination)
+  local post_text = post_json.content[1]
   local text_lines = vim.split(post_text, "\n")
   local buffer = vim.api.nvim_create_buf(true, false)
   vim.api.nvim_set_current_buf(buffer)
   vim.api.nvim_buf_set_lines(buffer, 0, 0, false, text_lines)
   vim.bo.filetype = "markdown"
+  status.set_post_status({
+    url = post_json.url[1],
+    destination = destination,
+    categories = post_json.category,
+    title = post_json.name[1],
+    draft = (post_json["post-status"][1] == "draft"),
+  })
 end
 
 local function telescope_choose_post(posts, cb)
@@ -95,41 +108,34 @@ local function telescope_choose_post(posts, cb)
   post_picker:find()
 end
 
+
+
+function M.get_post_from_url()
+  local destination = util.choose_destination("get")
+
+  vim.ui.input({
+    prompt = "url: "
+  }
+  , function(input)
+    local result = make_source_request(destination, input)
+    if result then
+      open_post(result.properties, destination)
+    end
+  end)
+end
+
 function M.pick_post()
   if config.app_token == nil then
     print("No app token found")
     return
   end
-  local destination
-  local blogs_map = {}
-  local blog_urls = {}
-  for _, blog in ipairs(config.blogs) do
-    blogs_map[blog.url] = blog.uid
-    table.insert(blog_urls, blog.url)
-  end
-  if #config.blogs > 1 then
-    vim.ui.select(blog_urls, {
-      prompt = "Edit post from: ",
-    }, function(input)
-      destination = blogs_map[input]
-    end)
-  else
-    destination = config.blogs[1]
-  end
-  local posts = get_posts(destination)
+  local destination = util.choose_destination("get")
+  local posts = get_post_list(destination)
   if vim.wait(10000, function()
-    return #posts > 0
-  end, 400) then
+        return #posts > 0
+      end, 400) then
     telescope_choose_post(posts, function(selection)
-      local props = selection.properties
-      open_post(props.content[1])
-      status.set_post_status({
-        url = props.url[1],
-        destination = destination,
-        categories = props.category,
-        title = props.name[1],
-        draft = (props["post-status"][1] == "draft"),
-      })
+      open_post(selection.properties, destination)
     end)
   end
 end
