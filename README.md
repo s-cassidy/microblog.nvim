@@ -71,7 +71,7 @@ Note that `microblog.nvim` does not set any keymaps by default.
 
 ## Usage
 
-`microblog.nvim` exposes 5 functions to the user that are also available as commands.
+`microblog.nvim` exposes the following functions to the user that are also available as commands.
 
 ### `pick_post()` or `MicroBlogPickPost`
 
