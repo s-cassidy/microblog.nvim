@@ -7,33 +7,39 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local telescope_conf = require("telescope.config").values
 local job = require("plenary.job")
+local curl = require("plenary.curl")
 
 local M = {}
 
 local function make_source_request(destination, url)
-  local curl_job = job:new({
-    command = "curl",
-    args = {
-      ("https://micro.blog/micropub?q=source&mp-destination=%s&url=%s"):format(destination, url),
-      "-H",
-      "Authorization: Bearer " .. config.app_token,
-      "--connect-timeout",
-      "10",
-    },
-    enabled_recording = true,
-  })
-  curl_job:sync()
+  local response = curl.get(
+    "https://micro.blog/micropub",
+    {
+      headers = {
+        authorization = "Bearer " .. config.app_token
+      },
+      query = {
+        q = "source",
+        ["mp-destination"] = destination or "",
+        url = url or "",
+      },
+      timeout = 10000,
+    }
+  )
 
-  local result_raw = curl_job:result()
-  if string.match(result_raw[1], "400 Bad request") then
+
+  local result_raw = response.body
+  if response.status == 400 then
     vim.notify("Bad request. Did you set your blog's UID correctly?")
     return
   end
-  local result = vim.fn.json_decode(result_raw)
-  if vim.tbl_isempty(result) then
-    vim.notify("Server sent an empty response. Did you set your app token correctly?")
+  if response.status == 200 then
+    local result = vim.fn.json_decode(result_raw)
+    if vim.tbl_isempty(result) then
+      vim.notify("Server sent an empty response. Did you set your app token correctly?")
+    end
+    return result
   end
-  return result
 end
 
 local function get_post_list(destination)
