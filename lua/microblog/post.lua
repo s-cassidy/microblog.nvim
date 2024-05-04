@@ -86,22 +86,25 @@ local function send_post_request(data, data_formatter)
     return false
   end
 
+  local url
   for _, header in ipairs(response.headers) do
     if string.match(header, "location: ") then
-      local url = string.gsub(header, "location: ", "")
-      if url ~= status.get_status("url") then
-        if response.status == 202 then
-          print("\nPost made to " .. url)
-        else
-          print("\nPost url updated to " .. url)
-        end
-      else
-        print("\nPost successfully updated")
-      end
-      data.opts.url = url
-      status.set_post_status(data.opts)
+      url = string.gsub(header, "location: ", "")
     end
   end
+
+  if url ~= status.get_status("url") then
+    if response.status == 202 then
+      print("\nPost made to " .. url)
+    elseif response.status == 201 then
+      print("\nPost url updated to " .. url)
+    end
+  else
+    print("\nPost successfully updated")
+  end
+
+  data.opts.url = url
+  status.set_post_status(data.opts)
   return true
 end
 
