@@ -81,7 +81,8 @@ local function telescope_choose_post(posts, cb)
         return {
           value = entry,
           display = display,
-          ordinal = entry.properties.published[1] .. entry.properties.name[1] .. entry.properties.content[1],
+          ordinal = entry.properties.published[1] ..
+              entry.properties.name[1] .. entry.properties.content[1] .. entry.properties.url[1],
         }
       end,
     }),
