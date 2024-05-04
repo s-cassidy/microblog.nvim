@@ -13,8 +13,7 @@ function M.telescope_choose_categories(all_categories, chosen_categories, cb)
   local existing_categories = status.get_status("categories") or {}
   local startup_complete = false
   local cat_picker = pickers.new({}, {
-    prompt_title =
-    "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
+    prompt_title = "Select categories (Use <tab> to select categories, <CR> to confirm selection. Quit this window to abort)",
     finder = finders.new_table({ results = all_categories }),
     sorter = telescope_conf.generic_sorter(),
     attach_mappings = function(prompt_bufnr, map)
@@ -73,7 +72,6 @@ local function choose_title()
   end)
   return title
 end
-
 
 --- Pick an url to post to
 ---@return string

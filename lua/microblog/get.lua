@@ -12,21 +12,17 @@ local curl = require("plenary.curl")
 local M = {}
 
 local function make_source_request(destination, url)
-  local response = curl.get(
-    "https://micro.blog/micropub",
-    {
-      headers = {
-        authorization = "Bearer " .. config.app_token
-      },
-      query = {
-        q = "source",
-        ["mp-destination"] = destination or "",
-        url = url or "",
-      },
-      timeout = 10000,
-    }
-  )
-
+  local response = curl.get("https://micro.blog/micropub", {
+    headers = {
+      authorization = "Bearer " .. config.app_token,
+    },
+    query = {
+      q = "source",
+      ["mp-destination"] = destination or "",
+      url = url or "",
+    },
+    timeout = 10000,
+  })
 
   local result_raw = response.body
   if response.status == 400 then
@@ -114,15 +110,12 @@ local function telescope_choose_post(posts, cb)
   post_picker:find()
 end
 
-
-
 function M.get_post_from_url()
   local destination = util.choose_destination("get")
 
   vim.ui.input({
-    prompt = "url: "
-  }
-  , function(input)
+    prompt = "url: ",
+  }, function(input)
     local result = make_source_request(destination, input)
     if result then
       open_post(result.properties, destination)
@@ -138,8 +131,8 @@ function M.pick_post()
   local destination = util.choose_destination("get")
   local posts = get_post_list(destination)
   if vim.wait(10000, function()
-        return #posts > 0
-      end, 400) then
+    return #posts > 0
+  end, 400) then
     telescope_choose_post(posts, function(selection)
       open_post(selection.properties, destination)
     end)

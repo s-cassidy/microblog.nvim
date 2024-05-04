@@ -61,16 +61,13 @@ local function send_post_request(data, data_formatter)
   local auth_string = "Bearer " .. data.token
   local formatted_data = data_formatter(data)
 
-  local response = curl.post(
-    "https://micro.blog/micropub",
-    {
-      body = formatted_data,
-      headers = {
-        content_type = "application/json",
-        authorization = auth_string,
-      },
-    }
-  )
+  local response = curl.post("https://micro.blog/micropub", {
+    body = formatted_data,
+    headers = {
+      content_type = "application/json",
+      authorization = auth_string,
+    },
+  })
 
   local response_body
   if #response.body > 0 then
@@ -119,8 +116,8 @@ local function finalise_post(data)
   local confirm = nil
   vim.ui.select({ "Post", "Abort" }, {
     prompt = "You are about to make a post with the following settings\n"
-        .. status.get_post_status_string(data.opts)
-        .. "\n",
+      .. status.get_post_status_string(data.opts)
+      .. "\n",
   }, function(choice)
     confirm = (choice == "Post")
   end)
@@ -128,7 +125,6 @@ local function finalise_post(data)
   if not confirm then
     return false
   end
-
 
   local result = send_post_request(data, formatter)
   if result then
