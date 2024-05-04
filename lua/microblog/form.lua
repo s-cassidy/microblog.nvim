@@ -1,5 +1,4 @@
 local config = require("microblog.config")
-local util = require("microblog.util")
 local status = require("microblog.status")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
