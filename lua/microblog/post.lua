@@ -116,8 +116,8 @@ local function finalise_post(data)
   local confirm = nil
   vim.ui.select({ "Post", "Abort" }, {
     prompt = "You are about to make a post with the following settings\n"
-      .. status.get_post_status_string(data.opts)
-      .. "\n",
+        .. status.get_post_status_string(data.opts)
+        .. "\n",
   }, function(choice)
     confirm = (choice == "Post")
   end)
@@ -159,7 +159,7 @@ function M.publish()
   end
 end
 
-function M.quick_post()
+function M.quickpost()
   local data = {}
   data.text = get_text()
   data.token = config.app_token

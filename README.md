@@ -41,7 +41,7 @@ You must pass an array `blogs`, where each entry is a table with fields `url` an
 Other options:
 
 - `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as `false` (recommended), it will just use the existing url attached to the post.
-- `no_save_quickpost`. If set to `true`, then using the `quick_post()` function will also set the buffer to a `nowrite` buffer (see below).
+- `no_save_quickpost`. If set to `true`, then using the `quickpost()` function will also set the buffer to a `nowrite` buffer (see below).
 - `token_warn_on_startup`. If set to `true`, you'll be alerted if the `MB_APP_TOKEN` is not defined as soon as the plugin loads. If set to `false`, you'll only be alerted if you take an action that requires the app token.
 
 **Example**
@@ -91,11 +91,11 @@ If you are editing an existing post or you have already successfully used `publi
 
 You can also use `publish` in visual mode to post only the selected lines of text.
 
-### `quick_post()` or `MicroBlogQuickPost`
+### `quickpost()` or `MicroBlogQuickPost`
 
 For quickly dashing off a "micro" post. This will post the current buffer with no title or categories to the **first** blog in your `blogs` list.
 
-If `no_save_quickpost` is set to `true`, this means you can `:q` without saving after running `quick_post()`. In other words, set this option if you don't care about keeping a local copy of your "micro" posts once they have been posted. You can still manually save with `:w <filename>`, if you like.
+If `no_save_quickpost` is set to `true`, this means you can `:q` without saving after running `quickpost()`. In other words, set this option if you don't care about keeping a local copy of your "micro" posts once they have been posted. You can still manually save with `:w <filename>`, if you like.
 
 ### `display_post_status()` or `MicroBlogDisplayStatus`
 
