@@ -1,4 +1,4 @@
-local job = require("plenary.job")
+local curl = require("plenary.curl")
 local status = require("microblog.status")
 local form = require("microblog.form")
 local categories = require("microblog.categories")
@@ -58,46 +58,51 @@ end
 --- @param data {text: string, token: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
 --- @return boolean
 local function send_post_request(data, data_formatter)
-  local auth_string = "Authorization: Bearer " .. data.token
+  local auth_string = "Bearer " .. data.token
   local formatted_data = data_formatter(data)
-  local args = {
+
+  local response = curl.post(
     "https://micro.blog/micropub",
-    "-X",
-    "POST",
-    "-H",
-    auth_string,
-    "-H",
-    "Content-Type: application/json",
-    "--data",
-    formatted_data,
-  }
+    {
+      body = formatted_data,
+      headers = {
+        content_type = "application/json",
+        authorization = auth_string,
+      },
+    }
+  )
 
-  local curl_job = job:new({
-    command = "curl",
-    args = args,
-    enable_recording = true,
-  })
-
-  curl_job:sync()
-  local result_raw = curl_job:result()
-  local await_post_confirmation = vim.wait(5000, function()
-    return #result_raw > 0
-  end)
-  if await_post_confirmation then
-    local result = vim.fn.json_decode(result_raw)
-    if result.error then
-      print("\nPosting failed: " .. result.error_description)
-      return false
-    else
-      data.opts.url = result.url
-      status.set_post_status(data.opts)
-      print("\nPost made to " .. result.url)
-      return true
-    end
-  else
-    status.set_post_status(data.opts)
-    return true
+  local response_body
+  if #response.body > 0 then
+    response_body = vim.fn.json_decode(response.body)
   end
+
+  if not vim.tbl_contains({ 200, 201, 202, 204 }, response.status) then
+    if response_body.error then
+      print("\nPosting failed: " .. response_body.error_description)
+      return false
+    end
+    print("\nPosting failed")
+    return false
+  end
+
+  for _, header in ipairs(response.headers) do
+    if string.match(header, "location: ") then
+      local url = string.gsub(header, "location: ", "")
+      if url ~= status.get_status("url") then
+        if response.status == 202 then
+          print("\nPost made to " .. url)
+        else
+          print("\nPost url updated to " .. url)
+        end
+      else
+        print("\nPost successfully updated")
+      end
+      data.opts.url = url
+      status.set_post_status(data.opts)
+    end
+  end
+  return true
 end
 
 local function finalise_post(data)
