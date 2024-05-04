@@ -137,7 +137,7 @@ local function finalise_post(data)
   end
 end
 
-function M.push_post()
+function M.publish()
   categories.refresh_categories()
 
   local data = {}

@@ -6,16 +6,22 @@ local status = require("microblog.status")
 local M = {}
 M.pick_post = get.pick_post
 M.get_post_from_url = get.get_post_from_url
-M.push_post = post.push_post
+M.publish = post.publish
 M.quick_post = post.quick_post
 M.display_post_status = status.display_post_status
 M.reset_post_status = status.reset_post_status
 
-vim.api.nvim_create_user_command("MicroBlogPickPost", get.pick_post, {})
-vim.api.nvim_create_user_command("MicroBlogQuickPost", post.quick_post, {})
-vim.api.nvim_create_user_command("MicroBlogPushPost", post.push_post, {})
-vim.api.nvim_create_user_command("MicroBlogDisplayStatus", status.display_post_status, {})
-vim.api.nvim_create_user_command("MicroBlogResetStatus", status.reset_post_status, {})
+vim.api.nvim_create_user_command("MicroBlogPickPost", get.pick_post,
+  { desc = "Pick a blog post from the server using Telescope" })
+vim.api.nvim_create_user_command("MicroBlogQuickPost", post.quick_post,
+  { desc = "Quickly send a blog post with default settings" })
+vim.api.nvim_create_user_command("MicroBlogPostFromUrl", get.get_post_from_url,
+  { desc = "Edit a blog post by entering its url" })
+vim.api.nvim_create_user_command("MicroBlogPublish", post.publish, { desc = "Publish or update blog post" })
+vim.api.nvim_create_user_command("MicroBlogDisplayStatus", status.display_post_status,
+  { desc = "Show micro.blog status of current buffer" })
+vim.api.nvim_create_user_command("MicroBlogResetStatus", status.reset_post_status,
+  { desc = "Reset blog metadata for current buffer" })
 
 local function get_app_token()
   return os.getenv(config.app_token_variable)
