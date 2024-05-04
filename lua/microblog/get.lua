@@ -1,4 +1,5 @@
 local status = require("microblog.status")
+local form = require("microblog.form")
 local config = require("microblog.config")
 local util = require("microblog.util")
 local pickers = require("telescope.pickers")
@@ -6,7 +7,6 @@ local finders = require("telescope.finders")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local telescope_conf = require("telescope.config").values
-local job = require("plenary.job")
 local curl = require("plenary.curl")
 
 local M = {}
@@ -111,7 +111,7 @@ local function telescope_choose_post(posts, cb)
 end
 
 function M.get_post_from_url()
-  local destination = util.choose_destination("get")
+  local destination = form.choose_destination("get")
 
   vim.ui.input({
     prompt = "url: ",
@@ -128,11 +128,11 @@ function M.pick_post()
     print("No app token found")
     return
   end
-  local destination = util.choose_destination("get")
+  local destination = form.choose_destination("get")
   local posts = get_post_list(destination)
   if vim.wait(10000, function()
-    return #posts > 0
-  end, 400) then
+        return #posts > 0
+      end, 400) then
     telescope_choose_post(posts, function(selection)
       open_post(selection.properties, destination)
     end)
