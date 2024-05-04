@@ -6,13 +6,13 @@ Simple plugin for posting to a [micro.blog](https://micro.blog)-hosted blog.
 
 `microblog.nvim` has depends on two neovim plugins and an external dependency, all of which you probably already have. These are the plugins `telescope.nvim` and `plenary.nvim`, and the CLI tool `curl`.
 
+On Linux use your usual package manager to install `curl`.
+
 On Mac you can do
 
 ```
 brew install curl
 ```
-
-On Linux use your usual package manager.
 
 ## Installation
 
@@ -40,8 +40,9 @@ You must pass an array `blogs`, where each entry is a table with fields `url` an
 
 Other options:
 
-- `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as `false`, it will just use the existing url attached to the post, which should work better for most people.
+- `always_input_url`. If this is set to `true`, you will be given the opportunity to manually edit the url of a post to update whenever you send a post to the server (which you can leave blank to make a new post). If this is left as `false` (recommended), it will just use the existing url attached to the post.
 - `no_save_quickpost`. If set to `true`, then using the `quick_post()` function will also set the buffer to a `nowrite` buffer (see below).
+- `token_warn_on_startup`. If set to `true`, you'll be alerted if the `MB_APP_TOKEN` is not defined as soon as the plugin loads. If set to `false`, you'll only be alerted if you take an action that requires the app token.
 
 **Example**
 
@@ -60,6 +61,7 @@ Other options:
     },
     always_input_url = false,
     no_save_quickpost = false,
+    token_warn_on_startup = false,
 }
 ```
 
@@ -77,13 +79,17 @@ Requests a list of posts from the server, and allows you to choose a post to edi
 
 Once selected, the post will be opened in a new buffer ready for editing.
 
-### `push_post()` or `MicroBlogPushPost`
+### `get_post_from_url()` or `MicroBlogPostFromUrl`
 
-This command is used to send your post back to the server and publish it on your blog. You will be asked to set some options such as a title (optional, naturally). Then you will be asked to set some categories for the post if they're enabled on your blog, again using `telescope`. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
+Opens prompt to input the url of a post. If given a valid url from your blog, it will open in a new buffer read for editing.
 
-If you are editing an existing post you selected with `pick_post` or you have already successfully used `push_post` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
+### `publish()` or `MicroBlogPublish`
 
-You can also use `push_post` in visual mode and only selected lines of text will be posted.
+This command is used to send your post back to the server and publish it on your blog. You will be asked to set some options such as a title. Then a `telescope` picker will allow you to select some categories for your post. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
+
+If you are editing an existing post or you have already successfully used `publish` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
+
+You can also use `publish` in visual mode to post only the selected lines of text.
 
 ### `quick_post()` or `MicroBlogQuickPost`
 
@@ -105,8 +111,8 @@ The next feature I would like to implement is a proper `telescope` previewer for
 
 I do not currently have plans to support other fuzzy finders such as `mini.fuzzy` or `fzf-lua`. PRs welcome if you want to implement these.
 
-I don't intend to add any features relating to following other users, reading other posts, or uploading photos. This is plugin is purely for writing and editing text posts, because neovim is a _text editor_.
+I don't intend to add any features relating to following other users, reading other posts, or uploading photos. This is plugin is purely for publishing text posts, because neovim is a _text editor_.
 
 ## Thanks
 
-To [Manton](https://manton.org) for creating micro.blog, as well as [HeyLoura](https://heyloura.com/) (check out her awesome site!) who built [LilliHub](https://lillihub.com/), whose source code provided useful examples of the API.
+To [Manton](https://manton.org) for creating micro.blog, [TJ](https://github.com/tjdevries) for creating `telescope` and `plenary`, and [HeyLoura](https://heyloura.com/) (check out her awesome site!) who built [LilliHub](https://lillihub.com/), whose source code provided useful examples of the API.
