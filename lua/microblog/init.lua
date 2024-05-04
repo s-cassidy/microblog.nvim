@@ -7,7 +7,7 @@ local M = {}
 M.pick_post = get.pick_post
 M.get_post_from_url = get.get_post_from_url
 M.publish = post.publish
-M.quick_post = post.quickpost
+M.quickpost = post.quickpost
 M.display_post_status = status.display_post_status
 M.reset_post_status = status.reset_post_status
 
