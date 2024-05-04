@@ -22,6 +22,9 @@ local function get_text()
   return text
 end
 
+--- Takes post data and formats body for a micropub create action
+---@param data table
+---@return string
 local function micropub_new_post_formatter(data)
   local json_data = {
     type = { "h-entry" },
@@ -36,7 +39,7 @@ local function micropub_new_post_formatter(data)
   return vim.fn.json_encode(json_data)
 end
 
---- Takes post data and formats for the new post API endpoint
+--- Takes post data and formats body for a micropub replace action
 ---@param data table
 ---@return string
 local function micropub_update_post_formatter(data)
@@ -56,6 +59,7 @@ end
 
 --- Run curl to post to the blog
 --- @param data {text: string, token: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
+--- @param data_formatter function
 --- @return boolean
 local function send_post_request(data, data_formatter)
   local auth_string = "Bearer " .. data.token
@@ -105,6 +109,9 @@ local function send_post_request(data, data_formatter)
   return true
 end
 
+---
+---@param data
+---@return boolean
 local function finalise_post(data)
   local formatter
   if data.opts.url == "" then
@@ -127,10 +134,8 @@ local function finalise_post(data)
   end
 
   local result = send_post_request(data, formatter)
-  if result then
-    status.set_post_status(data.opts)
-    return result
-  end
+  status.set_post_status(data.opts)
+  return result
 end
 
 function M.publish()
