@@ -14,9 +14,24 @@ local function get_text()
   if vim.fn.mode() == "n" then
     content_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   elseif vim.fn.mode() == "v" or vim.fn.mode() == "V" then
-    local line_start = vim.fn.getpos("v")[2]
-    local line_end = vim.fn.getpos(".")[2]
-    content_lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
+    local visual_start = vim.fn.getpos("v")
+    local visual_end = vim.fn.getpos(".")
+    -- "." is the cursor position, "v" is the other end of the visual selection.
+    -- They must be swapped if the cursor is at the start of the visual selection
+    if visual_start[2] > visual_end[2] or (
+          visual_start[2] == visual_end[2] and visual_start[3] > visual_end[3]
+        ) then
+      visual_start, visual_end = visual_end, visual_start
+    end
+
+    content_lines = vim.api.nvim_buf_get_text(
+      0,
+      visual_start[2] - 1,
+      visual_start[3] - 1,
+      visual_end[2] - 1,
+      visual_end[3],
+      {}
+    )
   end
   local text = table.concat(content_lines, "\n")
   return text
@@ -184,5 +199,7 @@ function M.quickpost()
     vim.bo.buftype = "nowrite"
   end
 end
+
+vim.keymap.set("v", "<leader>mg", get_text)
 
 return M
