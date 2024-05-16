@@ -36,7 +36,7 @@ function M.get_post_status_string(data)
   local categories_string = table.concat(status_for_display.categories, ", ")
   return ([[Post title: %s
 Post url: %s
-Desintation blog: %s
+Destination blog: %s
 Categories: %s
 Draft: %s]]):format(
     status_for_display.title or "",
