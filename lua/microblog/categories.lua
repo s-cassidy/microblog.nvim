@@ -20,14 +20,14 @@ local function extract_categories_from_json_feed(json_feed)
 end
 
 --- Run curl to get the categories from a blog
----@param blog {url: string, uid: string}
-local function fetch_categories(blog)
+---@param url string
+local function fetch_categories(url)
   local category_job = job:new({
     command = "curl",
-    args = { blog.url .. "/categories/feed.json" },
+    args = { url .. "/categories/feed.json" },
     enable_recording = true,
     on_exit = function(j)
-      raw_list[blog.uid] = j:result()
+      raw_list[url] = j:result()
     end,
   })
   category_job:start()
@@ -35,15 +35,15 @@ end
 
 function M.refresh_categories()
   for _, blog in ipairs(config.blogs) do
-    fetch_categories(blog)
+    fetch_categories(blog.url)
   end
 end
 
 --- Return parsed categories list
----@param uid string
+---@param url string
 ---@return string[]
-function M.get_categories(uid)
-  return extract_categories_from_json_feed(raw_list[uid])
+function M.get_categories(url)
+  return extract_categories_from_json_feed(raw_list[url])
 end
 
 return M

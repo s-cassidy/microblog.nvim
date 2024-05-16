@@ -106,20 +106,18 @@ local function choose_destination(mode)
 
   local destination
   local urls_list = {}
-  local urls_map = {}
   for _, blog in ipairs(config.blogs) do
     table.insert(urls_list, blog.url)
-    urls_map[blog.url] = blog.uid
   end
 
   if #config.blogs > 1 then
     vim.ui.select(urls_list, {
       prompt = (mode == "post" and "Destination: ") or "Edit post from: ",
     }, function(input)
-      destination = urls_map[input]
+      destination = input
     end)
   else
-    destination = config.blogs[1].uid
+    destination = config.blogs[1].url
   end
 
   return destination

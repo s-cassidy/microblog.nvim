@@ -6,6 +6,7 @@ local finders = require("telescope.finders")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local telescope_conf = require("telescope.config").values
+local util = require("microblog.util")
 local curl = require("plenary.curl")
 
 local M = {}
@@ -17,7 +18,7 @@ local function make_source_request(destination, url)
     },
     query = {
       q = "source",
-      ["mp-destination"] = destination or "",
+      ["mp-destination"] = util.url_to_uid(destination) or "",
       url = url or "",
     },
     timeout = 10000,
@@ -110,17 +111,20 @@ local function telescope_choose_post(posts, cb)
   post_picker:find()
 end
 
-function M.get_post_from_url()
-  local destination = form.choose_destination("get")
+function M.get_post_from_url(url)
+  if not url then
+    local destination = form.choose_destination("get")
 
-  vim.ui.input({
-    prompt = "url: ",
-  }, function(input)
-    local result = make_source_request(destination, input)
-    if result then
-      open_post(result.properties, destination)
-    end
-  end)
+    vim.ui.input({
+      prompt = "url: ",
+    }, function(input)
+      local result = make_source_request(destination, input)
+      if result then
+        open_post(result.properties, destination)
+      end
+    end)
+    return
+  end
 end
 
 function M.pick_post()

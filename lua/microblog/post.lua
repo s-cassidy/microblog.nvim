@@ -1,6 +1,7 @@
 local curl = require("plenary.curl")
 local status = require("microblog.status")
 local form = require("microblog.form")
+local util = require("microblog.util")
 local categories = require("microblog.categories")
 local config = require("microblog.config")
 
@@ -43,7 +44,7 @@ end
 local function micropub_new_post_formatter(data)
   local json_data = {
     type = { "h-entry" },
-    ["mp-destination"] = data.opts.destination,
+    ["mp-destination"] = util.url_to_uid(data.opts.destination),
     properties = {
       content = { { html = data.text } },
       name = { (data.opts.title or "") },
@@ -61,7 +62,7 @@ local function micropub_update_post_formatter(data)
   local json_data = {
     action = "update",
     url = data.opts.url,
-    ["mp-destination"] = data.opts.destination,
+    ["mp-destination"] = util.url_to_uid(data.opts.destination),
     replace = {
       name = { data.opts.title or "" },
       ["post-status"] = { (data.opts.draft and "draft") or "published" },
@@ -191,7 +192,7 @@ function M.quickpost()
     title = "",
     draft = false,
     categories = {},
-    destination = config.blogs[1].uid,
+    destination = config.blogs[1].url,
     url = "",
   }
   local result = finalise_post(data)
