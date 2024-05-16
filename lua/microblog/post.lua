@@ -44,7 +44,7 @@ end
 local function micropub_new_post_formatter(data)
   local json_data = {
     type = { "h-entry" },
-    ["mp-destination"] = util.url_to_uid(data.opts.destination),
+    ["mp-destination"] = util.url_to_uid(data.opts.blog_url),
     properties = {
       content = { { html = data.text } },
       name = { (data.opts.title or "") },
@@ -62,7 +62,7 @@ local function micropub_update_post_formatter(data)
   local json_data = {
     action = "update",
     url = data.opts.url,
-    ["mp-destination"] = util.url_to_uid(data.opts.destination),
+    ["mp-destination"] = util.url_to_uid(data.opts.blog_url),
     replace = {
       name = { data.opts.title or "" },
       ["post-status"] = { (data.opts.draft and "draft") or "published" },
@@ -74,7 +74,7 @@ local function micropub_update_post_formatter(data)
 end
 
 --- Run curl to post to the blog
---- @param data {text: string, token: string, opts: {title: string?, destination: string, draft: boolean, url: string?, categories: string[]?}}
+--- @param data {text: string, token: string, opts: {title: string?, blog_url: string, draft: boolean, url: string?, categories: string[]?}}
 --- @param data_formatter function
 --- @return boolean
 local function send_post_request(data, data_formatter)
@@ -167,13 +167,13 @@ function M.publish()
   data.opts = form.collect_user_options()
 
   local chosen_categories = {}
-  local all_destination_categories = categories.get_categories(data.opts.destination)
-  if vim.tbl_isempty(all_destination_categories) then
-    print("\nNo categories found for " .. data.opts.destination)
+  local all_blog_url_categories = categories.get_categories(data.opts.blog_url)
+  if vim.tbl_isempty(all_blog_url_categories) then
+    print("\nNo categories found for " .. data.opts.blog_url)
     data.opts.categories = chosen_categories
     finalise_post(data)
   else
-    form.telescope_choose_categories(all_destination_categories, chosen_categories, function()
+    form.telescope_choose_categories(all_blog_url_categories, chosen_categories, function()
       data.opts.categories = chosen_categories
       finalise_post(data)
     end)
@@ -192,7 +192,7 @@ function M.quickpost()
     title = "",
     draft = false,
     categories = {},
-    destination = config.blogs[1].url,
+    blog_url = config.blogs[1].url,
     url = "",
   }
   local result = finalise_post(data)

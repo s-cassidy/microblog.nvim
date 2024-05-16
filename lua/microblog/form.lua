@@ -99,12 +99,12 @@ local function choose_url()
   return url
 end
 
-local function choose_destination(mode)
-  if mode == "post" and status.get_status("destination") then
-    return status.get_status("destination")
+local function choose_blog_url(mode)
+  if mode == "post" and status.get_status("blog_url") then
+    return status.get_status("blog_url")
   end
 
-  local destination
+  local blog_url
   local urls_list = {}
   for _, blog in ipairs(config.blogs) do
     table.insert(urls_list, blog.url)
@@ -114,13 +114,13 @@ local function choose_destination(mode)
     vim.ui.select(urls_list, {
       prompt = (mode == "post" and "Post to: ") or "Edit post from: ",
     }, function(input)
-      destination = input
+      blog_url = input
     end)
   else
-    destination = config.blogs[1].url
+    blog_url = config.blogs[1].url
   end
 
-  return destination
+  return blog_url
 end
 
 --- Should post be made as a draft?
@@ -137,13 +137,13 @@ end
 
 function M.collect_user_options()
   local opts_table = {}
-  opts_table.destination = choose_destination("post")
+  opts_table.blog_url = choose_blog_url("post")
   opts_table.title = choose_title()
   opts_table.url = choose_url()
   opts_table.draft = choose_draft()
   return opts_table
 end
 
-M.choose_destination = choose_destination
+M.choose_blog_url = choose_blog_url
 
 return M

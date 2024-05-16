@@ -7,7 +7,7 @@ end
 function M.set_post_status(data)
   local status = initialise_status()
   status.title = data.title
-  status.destination = data.destination
+  status.blog_url = data.blog_url
   status.draft = data.draft
   status.categories = data.categories
   status.url = data.url
@@ -41,7 +41,7 @@ Categories: %s
 Draft: %s]]):format(
     status_for_display.title or "",
     (status_for_display.url == "" and "New post") or status_for_display.url,
-    status_for_display.destination or "",
+    status_for_display.blog_url or "",
     categories_string or "",
     (status_for_display.draft and "Yes") or "No"
   )

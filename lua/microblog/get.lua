@@ -11,14 +11,14 @@ local curl = require("plenary.curl")
 
 local M = {}
 
-local function make_source_request(destination, url)
+local function make_source_request(blog_url, url)
   local response = curl.get("https://micro.blog/micropub", {
     headers = {
       authorization = "Bearer " .. config.app_token,
     },
     query = {
       q = "source",
-      ["mp-destination"] = util.url_to_uid(destination) or "",
+      ["mp-destination"] = util.url_to_uid(blog_url) or "",
       url = url or "",
     },
     timeout = 10000,
@@ -38,8 +38,8 @@ local function make_source_request(destination, url)
   end
 end
 
-local function get_post_list(destination)
-  return make_source_request(destination, "")["items"]
+local function get_post_list(blog_url)
+  return make_source_request(blog_url, "")["items"]
 end
 
 local function format_telescope_entry_string(post)
@@ -56,7 +56,7 @@ local function format_telescope_entry_string(post)
   return post_date .. "  " .. snippet
 end
 
-local function open_post(post_json, destination)
+local function open_post(post_json, blog_url)
   local post_text = post_json.content[1]
   local text_lines = vim.split(post_text, "\n")
   local buffer = vim.api.nvim_create_buf(true, false)
@@ -65,7 +65,7 @@ local function open_post(post_json, destination)
   vim.bo.filetype = "markdown"
   status.set_post_status({
     url = post_json.url[1],
-    destination = destination,
+    blog_url = blog_url,
     categories = post_json.category,
     title = post_json.name[1],
     draft = (post_json["post-status"][1] == "draft"),
@@ -113,14 +113,14 @@ end
 
 function M.get_post_from_url(url)
   if not url then
-    local destination = form.choose_destination("get")
+    local blog_url = form.choose_blog_url("get")
 
     vim.ui.input({
       prompt = "url: ",
     }, function(input)
-      local result = make_source_request(destination, input)
+      local result = make_source_request(blog_url, input)
       if result then
-        open_post(result.properties, destination)
+        open_post(result.properties, blog_url)
       end
     end)
     return
@@ -132,13 +132,13 @@ function M.pick_post()
     print("No app token found")
     return
   end
-  local destination = form.choose_destination("get")
-  local posts = get_post_list(destination)
+  local blog_url = form.choose_blog_url("get")
+  local posts = get_post_list(blog_url)
   if vim.wait(10000, function()
         return #posts > 0
       end, 400) then
     telescope_choose_post(posts, function(selection)
-      open_post(selection.properties, destination)
+      open_post(selection.properties, blog_url)
     end)
   end
 end
