@@ -112,7 +112,7 @@ local function choose_destination(mode)
 
   if #config.blogs > 1 then
     vim.ui.select(urls_list, {
-      prompt = (mode == "post" and "Destination: ") or "Edit post from: ",
+      prompt = (mode == "post" and "Post to: ") or "Edit post from: ",
     }, function(input)
       destination = input
     end)
