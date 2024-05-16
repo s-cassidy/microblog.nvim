@@ -81,7 +81,7 @@ Once selected, the post will be opened in a new buffer ready for editing.
 
 ### `get_post_from_url()` or `MicroBlogPostFromUrl`
 
-Opens prompt to input the url of a post. If given a valid url from your blog, it will open in a new buffer read for editing.
+Opens prompt to input the url of a post. If given a valid url from your blog, it will open in a new buffer read for editing. You can also pass an url as an argument to `MicroBlogPostFromUrl` to open it without a prompt.
 
 ### `publish()` or `MicroBlogPublish`
 
