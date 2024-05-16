@@ -124,10 +124,10 @@ function M.get_post_from_url(url)
       open_post(result.properties, blog_url)
     end
   else
-    local blog_url = form.choose_blog_url("get")
     vim.ui.input({
       prompt = "url: ",
     }, function(input)
+      local blog_url = capture_destination(input)
       local result = make_source_request(blog_url, input)
       if result then
         open_post(result.properties, blog_url)
