@@ -23,8 +23,11 @@ vim.api.nvim_create_user_command(
 )
 vim.api.nvim_create_user_command(
   "MicroBlogPostFromUrl",
-  get.get_post_from_url,
-  { desc = "Edit a blog post by entering its url" }
+  function(opts) get.get_post_from_url(opts.args) end,
+  {
+    desc = "Edit a blog post by entering its url",
+    nargs = "?"
+  }
 )
 vim.api.nvim_create_user_command("MicroBlogPublish", post.publish, { desc = "Publish or update blog post" })
 vim.api.nvim_create_user_command(

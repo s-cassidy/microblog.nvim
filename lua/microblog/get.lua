@@ -111,10 +111,20 @@ local function telescope_choose_post(posts, cb)
   post_picker:find()
 end
 
-function M.get_post_from_url(url)
-  if not url then
-    local blog_url = form.choose_blog_url("get")
+local function capture_destination(url)
+  local _, _, destination = url:find("(https?://.-/)")
+  return destination
+end
 
+function M.get_post_from_url(url)
+  if url and url ~= "" then
+    local blog_url = capture_destination(url)
+    local result = make_source_request(blog_url, url)
+    if result then
+      open_post(result.properties, blog_url)
+    end
+  else
+    local blog_url = form.choose_blog_url("get")
     vim.ui.input({
       prompt = "url: ",
     }, function(input)
