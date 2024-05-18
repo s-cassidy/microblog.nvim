@@ -24,15 +24,18 @@ local function get_text()
         ) then
       visual_start, visual_end = visual_end, visual_start
     end
-
-    content_lines = vim.api.nvim_buf_get_text(
-      0,
-      visual_start[2] - 1,
-      visual_start[3] - 1,
-      visual_end[2] - 1,
-      visual_end[3],
-      {}
-    )
+    if vim.fn.mode() == "v" then
+      content_lines = vim.api.nvim_buf_get_text(
+        0,
+        visual_start[2] - 1,
+        visual_start[3] - 1,
+        visual_end[2] - 1,
+        visual_end[3],
+        {}
+      )
+    else
+      content_lines = vim.api.nvim_buf_get_lines(0, visual_start[2] - 1, visual_end[2], false)
+    end
   end
   local text = table.concat(content_lines, "\n")
   return text
