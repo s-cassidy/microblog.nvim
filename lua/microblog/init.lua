@@ -11,35 +11,6 @@ M.quickpost = post.quickpost
 M.display_post_status = status.display_post_status
 M.reset_post_status = status.reset_post_status
 
-vim.api.nvim_create_user_command(
-  "MicroBlogPickPost",
-  get.pick_post,
-  { desc = "Pick a blog post from the server using Telescope" }
-)
-vim.api.nvim_create_user_command(
-  "MicroBlogQuickPost",
-  post.quickpost,
-  { desc = "Quickly send a blog post with default settings" }
-)
-vim.api.nvim_create_user_command(
-  "MicroBlogPostFromUrl",
-  function(opts) get.get_post_from_url(opts.args) end,
-  {
-    desc = "Edit a blog post by entering its url",
-    nargs = "?"
-  }
-)
-vim.api.nvim_create_user_command("MicroBlogPublish", post.publish, { desc = "Publish or update blog post" })
-vim.api.nvim_create_user_command(
-  "MicroBlogDisplayStatus",
-  status.display_post_status,
-  { desc = "Show micro.blog status of current buffer" }
-)
-vim.api.nvim_create_user_command(
-  "MicroBlogResetStatus",
-  status.reset_post_status,
-  { desc = "Reset blog metadata for current buffer" }
-)
 
 local function get_app_token()
   return os.getenv(config.app_token_variable)

@@ -71,19 +71,19 @@ Note that `microblog.nvim` does not set any keymaps by default.
 
 ## Usage
 
-`microblog.nvim` exposes the following functions to the user that are also available as commands.
+`microblog.nvim` exposes the following functions to the user
 
-### `pick_post()` or `MicroBlogPickPost`
+### `pick_post()`
 
 Requests a list of posts from the server, and allows you to choose a post to edit using `telescope`. The mappings are `<CR>` to select, `q` or `<ESC>` to abort. If you have more than one blog configured, you will first be asked which blog to load the posts from.
 
 Once selected, the post will be opened in a new buffer ready for editing.
 
-### `get_post_from_url()` or `MicroBlogPostFromUrl`
+### `get_post_from_url()`
 
 Opens prompt to input the url of a post. If given a valid url from your blog, it will open in a new buffer read for editing. You can also pass an url as an argument to `MicroBlogPostFromUrl` to open it without a prompt.
 
-### `publish()` or `MicroBlogPublish`
+### `publish()`
 
 This command is used to send your post back to the server and publish it on your blog. You will be asked to set some options such as a title. Then a `telescope` picker will allow you to select some categories for your post. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
 
@@ -91,17 +91,17 @@ If you are editing an existing post or you have already successfully used `publi
 
 You can also use `publish` in visual mode to post only the selected lines of text.
 
-### `quickpost()` or `MicroBlogQuickPost`
+### `quickpost()`
 
 For quickly dashing off a "micro" post. This will post the current buffer with no title or categories to the **first** blog in your `blogs` list.
 
 If `no_save_quickpost` is set to `true`, this means you can `:q` without saving after running `quickpost()`. In other words, set this option if you don't care about keeping a local copy of your "micro" posts once they have been posted. You can still manually save with `:w <filename>`, if you like.
 
-### `display_post_status()` or `MicroBlogDisplayStatus`
+### `display_post_status()`
 
 If your buffer has been posted to the server already using `push_post`, or else loaded from the server using `pick_post`, you can use `display_post_status` to check some details about the post such as its title, url, and categories it belongs to.
 
-### `reset_post_status()` or `MicroBlogResetStatus`
+### `reset_post_status()`
 
 This will clear all the post metadata associated with the current buffer. Using `push_post` after using `reset_post_status` will be as if you're making a brand new post, even if you originally opened the buffer using `pick_post`.
 
