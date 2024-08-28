@@ -11,7 +11,7 @@ local curl = require("plenary.curl")
 
 local M = {}
 
-local function make_source_request(blog_url, url)
+local function make_source_request(blog_url, url, channel)
   local response = curl.get("https://micro.blog/micropub", {
     headers = {
       authorization = "Bearer " .. config.app_token,
@@ -19,7 +19,8 @@ local function make_source_request(blog_url, url)
     query = {
       q = "source",
       ["mp-destination"] = util.url_to_uid(blog_url) or "",
-      url = url or "",
+      ["mp-channel"] = channel,
+      url = url or ""
     },
     timeout = 10000,
   })
@@ -38,8 +39,8 @@ local function make_source_request(blog_url, url)
   end
 end
 
-local function get_post_list(blog_url)
-  return make_source_request(blog_url, "")["items"]
+local function get_entry_list(blog_url, channel)
+  return make_source_request(blog_url, "", channel)["items"]
 end
 
 local function format_telescope_entry_string(post)
@@ -56,19 +57,33 @@ local function format_telescope_entry_string(post)
   return post_date .. "  " .. snippet
 end
 
-local function open_post(post_json, blog_url)
-  local post_text = post_json.content[1]
-  local text_lines = vim.split(post_text, "\n")
+local function prepare_buffer(entry_json)
+  local entry_text = entry_json.content[1]
+  local text_lines = vim.split(entry_text, "\n")
   local buffer = vim.api.nvim_create_buf(true, false)
   vim.api.nvim_set_current_buf(buffer)
   vim.api.nvim_buf_set_lines(buffer, 0, 0, false, text_lines)
   vim.bo.filetype = "markdown"
+end
+
+local function open_post(post_json, blog_url)
+  prepare_buffer(post_json)
   status.set_post_status({
     url = post_json.url[1],
     blog_url = blog_url,
     categories = post_json.category,
     title = post_json.name[1],
     draft = (post_json["post-status"][1] == "draft"),
+  })
+end
+
+local function open_page(page_json, blog_url)
+  prepare_buffer(page_json)
+  status.set_page_status({
+    url = page_json.url[1],
+    blog_url = blog_url,
+    template = page_json["microblog-template"][1],
+    title = page_json.name[1],
   })
 end
 
@@ -137,20 +152,32 @@ function M.get_post_from_url(url)
   end
 end
 
-function M.pick_post()
+local function get_entries(channel)
   if config.app_token == nil then
     print("No app token found")
     return
   end
   local blog_url = form.choose_blog_url("get")
-  local posts = get_post_list(blog_url)
+  local entries = get_entry_list(blog_url, channel)
   if vim.wait(10000, function()
-        return #posts > 0
+        return #entries > 0
       end, 400) then
-    telescope_choose_post(posts, function(selection)
-      open_post(selection.properties, blog_url)
+    telescope_choose_post(entries, function(selection)
+      if channel == "pages" then
+        open_page(selection.properties, blog_url)
+      else
+        open_post(selection.properties, blog_url)
+      end
     end)
   end
+end
+
+function M.pick_post()
+  get_entries("posts")
+end
+
+function M.pick_page()
+  get_entries("pages")
 end
 
 return M

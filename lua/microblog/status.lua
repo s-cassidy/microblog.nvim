@@ -6,10 +6,21 @@ end
 
 function M.set_post_status(data)
   local status = initialise_status()
+  status.entry_type = "post"
   status.title = data.title
   status.blog_url = data.blog_url
   status.draft = data.draft
   status.categories = data.categories
+  status.url = data.url
+  vim.b.micro = status
+end
+
+function M.set_page_status(data)
+  local status = initialise_status()
+  status.entry_type = "page"
+  status.title = data.title
+  status.blog_url = data.blog_url
+  status.template = data.template
   status.url = data.url
   vim.b.micro = status
 end

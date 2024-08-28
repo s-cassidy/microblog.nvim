@@ -5,6 +5,7 @@ local status = require("microblog.status")
 
 local M = {}
 M.pick_post = get.pick_post
+M.pick_page = get.pick_page
 M.get_post_from_url = get.get_post_from_url
 M.publish = post.publish
 M.quickpost = post.quickpost
