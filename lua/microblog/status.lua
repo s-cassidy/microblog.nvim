@@ -6,7 +6,7 @@ end
 
 function M.set_post_status(data)
   local status = initialise_status()
-  status.entry_type = "post"
+  status.channel = "post"
   status.title = data.title
   status.blog_url = data.blog_url
   status.draft = data.draft
@@ -17,7 +17,7 @@ end
 
 function M.set_page_status(data)
   local status = initialise_status()
-  status.entry_type = "page"
+  status.channel = "page"
   status.title = data.title
   status.blog_url = data.blog_url
   status.template = data.template
@@ -56,6 +56,29 @@ Draft: %s]]):format(
     categories_string or "",
     (status_for_display.draft and "Yes") or "No"
   )
+end
+
+---
+---@param data table?
+function M.get_page_status_string(data)
+  local status = initialise_status()
+  local status_for_display = data or status
+  if vim.tbl_isempty(status_for_display) then
+    return nil
+  end
+  return ([[Post title: %s
+Post url: %s
+Destination blog: %s
+Path: %s
+]]):format(
+    status_for_display.title or "",
+    status_for_display.blog_url or "",
+    status_for_display.path or ""
+  )
+end
+
+function M.get_status_string(data, channel)
+  if channel == "page" then return M.get_page_status_string(data) else return M.get_post_status_string(data) end
 end
 
 function M.reset_post_status()

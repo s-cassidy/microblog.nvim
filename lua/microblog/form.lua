@@ -62,7 +62,7 @@ end
 
 --- Pick the post title
 ---@return string
-local function choose_title()
+function M.choose_title()
   local title
   vim.ui.input({
     prompt = "Post title (optional): ",
@@ -75,7 +75,7 @@ end
 
 --- Pick an url to post to
 ---@return string
-local function choose_url()
+function M.choose_url()
   local url
   if config.always_input_url then
     vim.ui.input({
@@ -99,7 +99,7 @@ local function choose_url()
   return url
 end
 
-local function choose_blog_url(mode)
+function M.choose_blog_url(mode)
   if mode == "post" and status.get_status("blog_url") then
     return status.get_status("blog_url")
   end
@@ -125,7 +125,7 @@ end
 
 --- Should post be made as a draft?
 ---@return boolean
-local function choose_draft()
+function M.choose_draft()
   local draft
   vim.ui.select({ "Yes", "No" }, {
     prompt = "\nPost as a draft?",
@@ -135,7 +135,7 @@ local function choose_draft()
   return draft
 end
 
-function M.collect_user_options()
+function M.collect_post_options()
   local opts_table = {}
   opts_table.blog_url = choose_blog_url("post")
   opts_table.title = choose_title()
@@ -144,6 +144,11 @@ function M.collect_user_options()
   return opts_table
 end
 
-M.choose_blog_url = choose_blog_url
+function M.collect_page_options()
+  local opts_table = {}
+  opts_table.blog_url = choose_blog_url("post")
+  opts_table.title = choose_title()
+  return opts_table
+end
 
 return M

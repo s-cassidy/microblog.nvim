@@ -1,14 +1,14 @@
 local config = require("microblog.config")
 local get = require("microblog.get")
-local post = require("microblog.post")
+local publish = require("microblog.publish")
 local status = require("microblog.status")
 
 local M = {}
 M.pick_post = get.pick_post
 M.pick_page = get.pick_page
 M.get_post_from_url = get.get_post_from_url
-M.publish = post.publish
-M.quickpost = post.quickpost
+M.publish = publish.publish
+M.quickpost = publish.quickpost
 M.display_post_status = status.display_post_status
 M.reset_post_status = status.reset_post_status
 
