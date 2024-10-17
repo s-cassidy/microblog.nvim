@@ -3,8 +3,8 @@ local config = require("microblog.config")
 
 local Entry = {}
 
-function Entry:new()
-  local entry = {}
+function Entry:new(buffer_data)
+  local entry = buffer_data or {}
   setmetatable(entry, Entry)
   self.__index = self
   return entry
@@ -101,6 +101,7 @@ function Entry:send_post_request()
   end
 
   self.url = response_url
+  return true
 end
 
 return Entry

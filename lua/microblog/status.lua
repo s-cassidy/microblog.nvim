@@ -77,18 +77,23 @@ Path: %s
   )
 end
 
-function M.get_status_string(data, channel)
-  if channel == "page" then return M.get_page_status_string(data) else return M.get_post_status_string(data) end
+function M.get_status_string()
+  if vim.b.micro then
+    print(vim.b.micro:get_status_string())
+  end
 end
 
 function M.reset_post_status()
-  vim.b.micro = {}
+  vim.b.micro = nil
 end
 
 function M.display_post_status()
-  local status_for_display = M.get_post_status_string()
+  local status_for_display
+  if vim.b.micro then
+    status_for_display = vim.b.micro:get_status_string()
+  end
   if status_for_display == nil then
-    vim.notify("Does not seem to be a micro.blog post")
+    vim.notify("Does not seem to be a micro.blog entry")
     return
   end
   vim.notify("micro.blog post information\n" .. status_for_display)

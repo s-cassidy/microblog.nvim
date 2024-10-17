@@ -6,10 +6,11 @@ local util = require("microblog.util")
 
 local Post = Entry:new()
 
-function Post:new()
-  local post = {}
+function Post:new(buffer_data)
+  local post = buffer_data or {}
   setmetatable(post, Post)
   self.__index = self
+  post.type = "post"
   return post
 end
 
@@ -19,13 +20,13 @@ end
 function Post:micropub_update_formatter(data)
   local json_data = {
     action = "update",
-    url = data.opts.url,
-    ["mp-destination"] = util.url_to_uid(data.opts.blog_url),
+    url = self.url,
+    ["mp-destination"] = util.url_to_uid(self.blog_url),
     replace = {
-      name = { data.opts.title or "" },
-      ["post-status"] = { (data.opts.draft and "draft") or "published" },
-      content = { data.text },
-      category = data.opts.categories,
+      name = { self.title or "" },
+      ["post-status"] = { (self.draft and "draft") or "published" },
+      content = { self.text },
+      category = self.categories,
     },
   }
   return vim.fn.json_encode(json_data)
@@ -82,8 +83,7 @@ function Post:finalise()
     return false
   end
 
-  local result = self:send_post_request()
-  -- status.set_post_status(data.opts)
+  return true
 end
 
 function Post:collect_user_options()
@@ -98,7 +98,7 @@ function Post:setup()
   self:collect_user_options()
 end
 
-function Post:publish(cb)
+function Post:publish()
   categories.refresh_categories()
   self:setup()
   local chosen_categories = {}
@@ -106,14 +106,20 @@ function Post:publish(cb)
   if vim.tbl_isempty(all_blog_url_categories) then
     print("\nNo categories found for " .. self.blog_url)
     self.categories = chosen_categories
-    if self:finalise(data) then
-      cb()
+    if self:finalise() then
+      local success = self:send_post_request()
+      if success then
+        vim.b.micro = self
+      end
     end
   else
     form.telescope_choose_categories(all_blog_url_categories, chosen_categories, function()
-      data.opts.categories = chosen_categories
-      if self:finalise(data) then
-        cb()
+      self.categories = chosen_categories
+      if self:finalise() then
+        local success = self:send_post_request()
+        if success then
+          vim.b.micro = self
+        end
       end
     end)
   end
