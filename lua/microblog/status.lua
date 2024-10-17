@@ -6,7 +6,7 @@ end
 
 function M.set_post_status(data)
   local status = initialise_status()
-  status.channel = "post"
+  status.type = "post"
   status.title = data.title
   status.blog_url = data.blog_url
   status.draft = data.draft
@@ -17,7 +17,7 @@ end
 
 function M.set_page_status(data)
   local status = initialise_status()
-  status.channel = "page"
+  status.page = "page"
   status.title = data.title
   status.blog_url = data.blog_url
   status.template = data.template
