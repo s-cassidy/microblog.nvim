@@ -17,7 +17,7 @@ end
 
 function M.set_page_status(data)
   local status = initialise_status()
-  status.page = "page"
+  status.type = "page"
   status.title = data.title
   status.blog_url = data.blog_url
   status.template = data.template
@@ -34,28 +34,6 @@ function M.get_status(field)
   else
     return nil
   end
-end
-
----
----@param data table?
-function M.get_post_status_string(data)
-  local status = initialise_status()
-  local status_for_display = data or status
-  if vim.tbl_isempty(status_for_display) then
-    return nil
-  end
-  local categories_string = table.concat(status_for_display.categories, ", ")
-  return ([[Post title: %s
-Post url: %s
-Destination blog: %s
-Categories: %s
-Draft: %s]]):format(
-    status_for_display.title or "",
-    (status_for_display.url == "" and "New post") or status_for_display.url,
-    status_for_display.blog_url or "",
-    categories_string or "",
-    (status_for_display.draft and "Yes") or "No"
-  )
 end
 
 ---
