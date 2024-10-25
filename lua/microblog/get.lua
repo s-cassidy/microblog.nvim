@@ -63,6 +63,8 @@ local function prepare_buffer(entry_json)
   local buffer = vim.api.nvim_create_buf(true, false)
   vim.api.nvim_set_current_buf(buffer)
   vim.api.nvim_buf_set_lines(buffer, 0, 0, false, text_lines)
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  vim.api.nvim_buf_set_lines(buffer, -2, -1, true, {}) -- remove the trailing blank line that is added
   vim.bo.filetype = "markdown"
 end
 
