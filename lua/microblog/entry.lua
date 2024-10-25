@@ -55,7 +55,6 @@ end
 
 --- Run curl to post to the blog
 --- @param data {text: string, token: string, opts: {title: string?, blog_url: string, draft: boolean, url: string?, categories: string[]?}}
---- @param data_formatter function
 --- @return boolean
 function Entry:send_post_request()
   local auth_string = "Bearer " .. config.app_token
@@ -68,11 +67,11 @@ function Entry:send_post_request()
       authorization = auth_string,
     },
   })
-
   local response_body
   if #response.body > 0 then
     response_body = vim.fn.json_decode(response.body)
   end
+  vim.b.response = response
 
   if not vim.tbl_contains({ 200, 201, 202, 204 }, response.status) then
     if response_body.error then
@@ -87,6 +86,9 @@ function Entry:send_post_request()
   for _, header in ipairs(response.headers) do
     if string.match(header, "location: ") then
       response_url = string.gsub(header, "location: ", "")
+    else
+      print("\nPage successfully updated")
+      return true
     end
   end
 
