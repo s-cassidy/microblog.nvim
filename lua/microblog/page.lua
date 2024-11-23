@@ -73,9 +73,10 @@ end
 function Page:publish()
   self:setup()
   if self:finalise() then
-    local success = self:send_post_request()
-    if success then
+    local response = self:send_post_request()
+    if response.status == 200 then
       vim.b.micro = self
+      print("\nPage successfully updated")
     end
   end
 end

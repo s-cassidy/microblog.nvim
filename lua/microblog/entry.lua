@@ -71,7 +71,6 @@ function Entry:send_post_request()
   if #response.body > 0 then
     response_body = vim.fn.json_decode(response.body)
   end
-  vim.b.response = response
 
   if not vim.tbl_contains({ 200, 201, 202, 204 }, response.status) then
     if response_body.error then
@@ -81,29 +80,7 @@ function Entry:send_post_request()
     print("\nPosting failed")
     return false
   end
-
-  local response_url
-  for _, header in ipairs(response.headers) do
-    if string.match(header, "location: ") then
-      response_url = string.gsub(header, "location: ", "")
-    else
-      print("\nPage successfully updated")
-      return true
-    end
-  end
-
-  if response_url ~= self.url then
-    if response.status == 202 then
-      print("\nPost made to " .. response_url)
-    elseif response.status == 201 then
-      print("\nPost url updated to " .. response_url)
-    end
-  else
-    print("\nPost successfully updated")
-  end
-
-  self.url = response_url
-  return true
+  return response
 end
 
 return Entry

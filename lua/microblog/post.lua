@@ -2,6 +2,7 @@ local categories = require("microblog.categories")
 local Entry = require("microblog.entry")
 local form = require("microblog.form")
 local util = require("microblog.util")
+local config = require("microblog.config")
 
 
 local Post = Entry:new()
@@ -116,12 +117,50 @@ function Post:publish()
     form.telescope_choose_categories(all_blog_url_categories, chosen_categories, function()
       self.categories = chosen_categories
       if self:finalise() then
-        local success = self:send_post_request()
-        if success then
-          vim.b.micro = self
+        local response = self:send_post_request()
+        local response_url
+        for _, header in ipairs(response.headers) do
+          if string.match(header, "location: ") then
+            response_url = string.gsub(header, "location: ", "")
+          end
         end
+        if response_url ~= self.url then
+          if response.status == 202 then
+            print("\nPost made to " .. response_url)
+          elseif response.status == 201 then
+            print("\nPost url updated to " .. response_url)
+          end
+        else
+          print("\nPost successfully updated")
+        end
+        self.url = response_url
+        vim.b.micro = self
       end
     end)
+  end
+end
+
+function Post:quickpost()
+  self.formatter = self.micropub_new_formatter
+  self.title = ""
+  self.draft = false
+  self.categories = {}
+  self.blog_url = config.blogs[1].url
+  self.url = ""
+  self.text = self:get_text()
+  local response = self:send_post_request()
+  local response_url
+  for _, header in ipairs(response.headers) do
+    if string.match(header, "location: ") then
+      response_url = string.gsub(header, "location: ", "")
+    end
+  end
+  if response_url ~= self.url then
+    if response.status == 202 then
+      print("QuickPost successful")
+      self.url = response_url
+      vim.b.micro = self
+    end
   end
 end
 

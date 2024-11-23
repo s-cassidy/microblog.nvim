@@ -79,13 +79,21 @@ Requests a list of posts from the server, and allows you to choose a post to edi
 
 Once selected, the post will be opened in a new buffer ready for editing.
 
+### `pick_page()`
+
+Requests a list of pages (/about, /now, etc) from the server, and allows you to choose a page to edit using `telescope`. The mappings are `<CR>` to select, `q` or `<ESC>` to abort. If you have more than one blog configured, you will first be asked which blog to load the posts from.
+
+Once selected, the post will be opened in a new buffer ready for editing.
+
+Note that currently there no intention of supporting the creation and management of pages in this plugin. You can open an existing page, edit it, and then publish the changes by running `publish()`.
+
 ### `get_post_from_url()`
 
 Opens prompt to input the url of a post. If given a valid url from your blog, it will open in a new buffer read for editing. You can also pass an url as an argument to `MicroBlogPostFromUrl` to open it without a prompt.
 
 ### `publish()`
 
-This command is used to send your post back to the server and publish it on your blog. You will be asked to set some options such as a title. Then a `telescope` picker will allow you to select some categories for your post. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
+This command is used to send your post or page back to the server and publish it on your blog. You will be asked to set some options such as a title. Then a `telescope` picker will allow you to select some categories for your post. Use `<tab>` to toggle categories on and off, and then hit `<CR>` to confirm the selection.
 
 If you are editing an existing post or you have already successfully used `publish` on this buffer, most of these options will have defaults already set, and the result will be to update the post. Alternatively, if you are in a buffer that you haven't already posted before, the result will be a new post.
 
